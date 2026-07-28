@@ -2795,7 +2795,7 @@
                     say: has.temp && num('temp') >= 38
                         ? 'Measured temperature is 38 C or above with a raised pulse. That combination needs a clinician today.'
                         : raised ? `Pulse is ${dev.delta > 0 ? '+' : ''}${dev.delta} bpm against your usual. Confirm with a thermometer before anyone reacts.`
-                            : 'Pulse sits in your usual range. The belt cannot measure body temperature, so a thermometer is always the confirming step.'
+                            : 'Pulse sits in your usual range.'
                 },
 
                 {
