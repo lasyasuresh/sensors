@@ -1951,17 +1951,18 @@
     </div>
 
     <script>
-        /* ═══════════════ state ═══════════════ */
-        const API = '';
-        let PI = localStorage.getItem('piUrl') || '';
-(function(){
-  const q = new URLSearchParams(location.search).get('pi');
-  if(q){ PI = q.replace(/\/$/,''); localStorage.setItem('piUrl', PI); }
-})();
-function setPi(){
-  const v = prompt('Belt address', PI || 'https://xxx.trycloudflare.com');
-  if(v !== null){ PI = v.replace(/\/$/,''); localStorage.setItem('piUrl', PI); }
-}
+       /* ═══════════════ state ═══════════════ */
+        const PI_DEFAULT = 'https://helps-treatments-detector-insider.trycloudflare.com';
+        let PI = localStorage.getItem('piUrl') || PI_DEFAULT;
+        (function () {
+            const q = new URLSearchParams(location.search).get('pi');
+            if (q) { PI = q.replace(/\/$/, ''); localStorage.setItem('piUrl', PI); }
+        })();
+        const API = PI;
+        function setPi() {
+            const v = prompt('Belt address', PI);
+            if (v !== null) { PI = v.replace(/\/$/, ''); localStorage.setItem('piUrl', PI); location.reload(); }
+        }
         
         const S = {
             user: { name: 'Priya', phone: '' },
@@ -2802,7 +2803,7 @@ function setPi(){
                     : `<div class="card"><div class="sm">Not enough clean readings yet.</div></div>`;
             } catch (e) { $('pr-base').innerHTML = ''; }
         }
-        function downloadReport() { window.open(`/api/report/${S.subject}`, '_blank'); }
+        function downloadReport() { window.open(`${API}/api/report/${S.subject}`, '_blank'); }
 
         paintNav('s-home');
     </script>
