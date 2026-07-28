@@ -344,6 +344,13 @@
         .field+.field {
             margin-top: 12px
         }
+        .two>.field+.field {
+            margin-top: 0
+        }
+
+        .two {
+            align-items: start
+        }
 
         .two {
             display: grid;
@@ -1634,12 +1641,6 @@
                         <div class="icon" style="background:var(--amber-soft)">🌡</div>
                         <b>Temperature</b><em>Thermometer</em>
                     </div>
-                    <div class="tile" onclick="go('s-symptoms')">
-                        <div class="icon">📋</div><b>How you feel</b><em>Checklist</em>
-                    </div>
-                    <div class="tile" onclick="go('s-reading')">
-                        <div class="icon">💜</div><b>Belt reading</b><em>5 minutes</em>
-                    </div>
                     <div class="tile" onclick="go('s-weight')">
                         <div class="icon">⚖️</div><b>Weight</b><em>Weekly</em>
                     </div>
@@ -1657,7 +1658,7 @@
             <nav class="nav"></nav>
         </section>
 
-        <!-- ══════════════════ BELT READING ══════════════════ -->
+        <!-- ══════════════════ BELT READING ══════════════════
         <section class="screen" id="s-reading">
             <div class="top">
                 <div class="back" onclick="go('s-log',1)">←</div>
@@ -1700,7 +1701,7 @@
                     reading rarely yields five minutes of data.</div>
             </div>
             <nav class="nav"></nav>
-        </section>
+        </section> -->
 
         <!-- ══════════════════ BLOOD PRESSURE ══════════════════ -->
         <section class="screen" id="s-bp">
