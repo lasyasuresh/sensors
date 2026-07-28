@@ -54,7 +54,7 @@ def _headers():
 def sb_get(table: str, params: Dict[str, Any], limit: int = 5000) -> List[dict]:
     """Paged select. PostgREST caps each response at 1000 rows."""
     out, offset, PAGE = [], 0, 1000
-    with httpx.Client(timeout=20) as c:
+    with httpx.Client(timeout=6) as c:
         while offset < limit:
             h = dict(_headers())
             h["Range"] = f"{offset}-{offset + PAGE - 1}"
@@ -488,7 +488,7 @@ def health():
 @app.get("/api/subjects")
 def subjects():
     rows = sb_get("readings", {"select": "subject_id",
-                               "subject_id": "not.is.null"}, limit=20000)
+                               "subject_id": "not.is.null"}, limit=2000)
     seen: Dict[str, int] = {}
     for r in rows:
         seen[r["subject_id"]] = seen.get(r["subject_id"], 0) + 1
