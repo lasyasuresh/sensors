@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Maternal belt · dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F6F4FA;
+            --card: #fff;
+            --ink: #241E36;
+            --muted: #7C7590;
+            --hair: #EAE6F2;
+            --violet: #7C5CD6;
+            --violet-soft: #EEE9FB;
+            --teal: #238C7E;
+            --teal-soft: #E1F2EF;
+            --amber: #B87516;
+            --amber-soft: #FBF0DC;
+            --coral: #B93F3F;
+            --coral-soft: #FBE8E7;
+            --sans: 'Inter', system-ui, sans-serif;
+            --display: 'Bricolage Grotesque', system-ui, sans-serif;
+            --mono: 'IBM Plex Mono', ui-monospace, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            background: var(--bg);
+            font-family: var(--sans);
+            color: var(--ink);
+            padding: 28px 22px 70px
+        }
+
+        .wrap {
+            max-width: 1280px;
+            margin: 0 auto
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 26px
+        }
+
+        h1 {
+            font-family: var(--display);
+            font-size: 29px;
+            font-weight: 800;
+            letter-spacing: -.02em
+        }
+
+        .sub {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            margin-top: 5px
+        }
+
+        select,
+        input,
+        button {
+            font-family: var(--sans);
+            font-size: 13px;
+            padding: 9px 12px;
+            border: 1px solid var(--hair);
+            border-radius: 11px;
+            background: #fff;
+            color: var(--ink)
+        }
+
+        button {
+            background: var(--ink);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: 600
+        }
+
+        button:hover {
+            opacity: .88
+        }
+
+        button.ghost {
+            background: #fff;
+            color: var(--ink);
+            border: 1px solid var(--hair)
+        }
+
+        .grid {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 16px
+        }
+
+        .g2 {
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr))
+        }
+
+        .g3 {
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr))
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--hair);
+            border-radius: 18px;
+            padding: 18px
+        }
+
+        .card h2 {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 500;
+            margin-bottom: 14px
+        }
+
+        .big {
+            font-family: var(--mono);
+            font-size: 34px;
+            font-weight: 600;
+            letter-spacing: -.03em;
+            line-height: 1
+        }
+
+        .big small {
+            font-size: 14px;
+            color: var(--muted);
+            font-weight: 400;
+            margin-left: 3px
+        }
+
+        .lbl {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 6px;
+            line-height: 1.5
+        }
+
+        .chip {
+            font-family: var(--mono);
+            font-size: 9.5px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            padding: 4px 9px;
+            border-radius: 99px;
+            font-weight: 600;
+            display: inline-block
+        }
+
+        .t0 {
+            background: #F2F0F7;
+            color: var(--muted)
+        }
+
+        .t1 {
+            background: var(--teal-soft);
+            color: var(--teal)
+        }
+
+        .t2 {
+            background: var(--amber-soft);
+            color: var(--amber)
+        }
+
+        .t3 {
+            background: var(--coral-soft);
+            color: var(--coral)
+        }
+
+        .alert {
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid var(--hair);
+            margin-bottom: 10px
+        }
+
+        .alert.a1 {
+            background: var(--teal-soft);
+            border-color: #CFE8E3
+        }
+
+        .alert.a2 {
+            background: var(--amber-soft);
+            border-color: #F0DFBE
+        }
+
+        .alert.a3 {
+            background: var(--coral-soft);
+            border-color: #F2CFCD
+        }
+
+        .alert h3 {
+            font-family: var(--display);
+            font-size: 16px;
+            font-weight: 800;
+            margin: 9px 0 6px;
+            letter-spacing: -.01em
+        }
+
+        .alert p {
+            font-size: 12.5px;
+            line-height: 1.6;
+            color: #5A5268
+        }
+
+        .alert ul {
+            list-style: none;
+            margin-top: 10px;
+            background: rgba(255, 255, 255, .6);
+            border-radius: 10px;
+            padding: 9px 11px
+        }
+
+        .alert li {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: #5A5268;
+            padding: 2.5px 0 2.5px 11px;
+            position: relative;
+            line-height: 1.5
+        }
+
+        .alert li::before {
+            content: '·';
+            position: absolute;
+            left: 1px;
+            font-size: 14px;
+            top: -1px
+        }
+
+        .alert .act {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px
+        }
+
+        th {
+            font-family: var(--mono);
+            font-size: 9.5px;
+            letter-spacing: .09em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-align: left;
+            font-weight: 500;
+            padding: 7px 8px;
+            border-bottom: 1px solid var(--hair)
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid var(--hair)
+        }
+
+        td.n {
+            font-family: var(--mono);
+            font-weight: 500
+        }
+
+        tr.sel {
+            background: var(--violet-soft)
+        }
+
+        tbody tr {
+            cursor: pointer
+        }
+
+        tbody tr:hover {
+            background: #FAF9FD
+        }
+
+        .chartbox {
+            position: relative;
+            height: 230px
+        }
+
+        .form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+            margin-bottom: 12px
+        }
+
+        .form label {
+            font-size: 11px;
+            color: var(--muted);
+            display: block;
+            margin-bottom: 4px
+        }
+
+        .form input,
+        .form select {
+            width: 100%
+        }
+
+        .checks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px
+        }
+
+        .checks label {
+            font-size: 11.5px;
+            background: #F7F5FB;
+            border: 1px solid var(--hair);
+            border-radius: 9px;
+            padding: 6px 10px;
+            cursor: pointer;
+            display: flex;
+            gap: 5px;
+            align-items: center
+        }
+
+        .checks input {
+            width: auto;
+            padding: 0
+        }
+
+        .muted {
+            font-size: 11.5px;
+            color: var(--muted);
+            line-height: 1.6
+        }
+
+        .err {
+            background: var(--coral-soft);
+            color: var(--coral);
+            padding: 11px 13px;
+            border-radius: 11px;
+            font-size: 12.5px;
+            margin-bottom: 12px
+        }
+
+        .spin {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        footer {
+            margin-top: 34px;
+            padding-top: 20px;
+            border-top: 1px solid var(--hair);
+            font-size: 11.5px;
+            color: var(--muted);
+            line-height: 1.7
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <header>
+            <div>
+                <h1>Belt dashboard</h1>
+                <div class="sub" id="meta">connecting…</div>
+            </div>
+            <div style="display:flex;gap:9px;align-items:center">
+                <select id="subject"></select>
+                <select id="posture">
+                    <option value="">all postures</option>
+                    <option value="sitting" selected>sitting</option>
+                    <option value="lying">lying</option>
+                </select>
+                <button class="ghost" onclick="loadAll()">Refresh</button>
+                <button onclick="downloadReport()">Report PDF</button>
+            </div>
+        </header>
+
+        <div id="error"></div>
+
+        <!-- top row -->
+        <div class="grid g3">
+            <div class="card">
+                <h2>Resting baseline</h2>
+                <div class="big" id="bl-mean">—</div>
+                <div class="lbl" id="bl-note">no data</div>
+            </div>
+            <div class="card">
+                <h2>Latest session</h2>
+                <div class="big" id="lt-hr">—</div>
+                <div class="lbl" id="lt-note">no data</div>
+            </div>
+            <div class="card">
+                <h2>Deviation</h2>
+                <div class="big" id="dv-delta">—</div>
+                <div class="lbl" id="dv-note">no data</div>
+            </div>
+        </div>
+
+        <!-- alerts + heat -->
+        <div class="grid g2">
+            <div class="card">
+                <h2>What the system is saying</h2>
+                <div id="cards">
+                    <div class="spin">loading…</div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>Heat &amp; environment</h2>
+                <div id="heat">
+                    <div class="spin">loading…</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- charts -->
+        <div class="grid g2">
+            <div class="card">
+                <h2>Resting pulse across sessions</h2>
+                <div class="chartbox"><canvas id="trend"></canvas></div>
+            </div>
+            <div class="card">
+                <h2>Session detail <span id="sd-name" style="text-transform:none;letter-spacing:0"></span></h2>
+                <div class="chartbox"><canvas id="detail"></canvas></div>
+            </div>
+        </div>
+
+        <!-- sessions table -->
+        <div class="card" style="margin-bottom:16px">
+            <h2>Sessions — click a row to chart it</h2>
+            <div style="overflow-x:auto">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Session</th>
+                            <th>Context</th>
+                            <th>Posture</th>
+                            <th>Windows</th>
+                            <th>Usable</th>
+                            <th>Quality</th>
+                            <th>Pulse</th>
+                            <th>Range</th>
+                            <th>SpO2</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sess"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- interactive rules -->
+        <div class="grid g2">
+            <div class="card">
+                <h2>Gestosis score · FOGSI</h2>
+                <div class="form">
+                    <div><label>Age</label><input type="number" id="p-age" value="32"></div>
+                    <div><label>BMI</label><input type="number" step="0.1" id="p-bmi" value="31.2"></div>
+                    <div><label>MAP (mmHg)</label><input type="number" id="p-map" value="88"></div>
+                    <div><label>Weeks</label><input type="number" id="p-wk" value="28"></div>
+                </div>
+                <div class="checks">
+                    <label><input type="checkbox" id="p-primi" checked> First pregnancy</label>
+                    <label><input type="checkbox" id="p-art"> ART</label>
+                    <label><input type="checkbox" id="p-prior"> Prior PE</label>
+                    <label><input type="checkbox" id="p-htn"> Chronic HTN</label>
+                    <label><input type="checkbox" id="p-dm"> Diabetes</label>
+                    <label><input type="checkbox" id="p-multi"> Twins</label>
+                </div>
+                <button onclick="runGestosis()">Calculate</button>
+                <div id="gest" style="margin-top:13px"></div>
+            </div>
+
+            <div class="card">
+                <h2>Manual entry · run the rules</h2>
+                <div class="form">
+                    <div><label>Temperature °C</label><input type="number" step="0.1" id="m-temp" placeholder="37.0">
+                    </div>
+                    <div><label>Weight gain kg/wk</label><input type="number" step="0.1" id="m-wt" placeholder="0.4">
+                    </div>
+                    <div><label>Systolic</label><input type="number" id="m-sbp" placeholder="120"></div>
+                    <div><label>Diastolic</label><input type="number" id="m-dbp" placeholder="78"></div>
+                    <div><label>Last Hb g/dL</label><input type="number" step="0.1" id="m-hb" placeholder="11.5"></div>
+                    <div><label>Iron missed (days)</label><input type="number" id="m-ifa" value="0"></div>
+                </div>
+                <div class="checks">
+                    <label><input type="checkbox" value="headache"> Headache</label>
+                    <label><input type="checkbox" value="vision"> Vision</label>
+                    <label><input type="checkbox" value="epigastric"> Rib pain</label>
+                    <label><input type="checkbox" value="swelling"> Swelling</label>
+                    <label><input type="checkbox" value="tiredness"> Tiredness</label>
+                    <label><input type="checkbox" value="breathlessness"> Breathless</label>
+                    <label><input type="checkbox" value="dizziness"> Dizziness</label>
+                    <label><input type="checkbox" id="m-leak"> Fluid leak</label>
+                </div>
+                <button onclick="runAssess()">Assess</button>
+                <div id="assess" style="margin-top:13px"></div>
+            </div>
+        </div>
+
+        <footer>
+            Pulse and oxygen come from an uncalibrated MAX30100; windows below the signal-quality
+            threshold are excluded rather than reported. Temperature and humidity are ambient air
+            from a DHT11 and are not body measurements. Nothing here is a diagnosis.
+        </footer>
+    </div>
+
+    <script>
+        const API = '';
+        let SUBJECT = null, SESSIONS = [], trendChart = null, detailChart = null;
+
+        const $ = id => document.getElementById(id);
+        const fmt = (v, d = 1) => (v === null || v === undefined) ? '—' : Number(v).toFixed(d);
+
+        async function get(path) {
+            const r = await fetch(API + path);
+            if (!r.ok) throw new Error(path + ' -> ' + r.status);
+            return r.json();
+        }
+        async function post(path, body) {
+            const r = await fetch(API + path, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            if (!r.ok) throw new Error(path + ' -> ' + r.status);
+            return r.json();
+        }
+        function showError(msg) {
+            $('error').innerHTML = `<div class="err">${msg}</div>`;
+        }
+
+        // ---------- alert cards ----------
+        function cardHTML(c) {
+            const names = ['Log', 'Self-care', 'Confirm it', 'Call your provider'];
+            return `<div class="alert a${c.tier}">
+    <span class="chip t${c.tier}">${names[c.tier]}</span>
+    <h3>${c.title}</h3>
+    <p>${c.detail}</p>
+    ${c.evidence && c.evidence.length ? '<ul>' + c.evidence.map(e => `<li>${e}</li>`).join('') + '</ul>' : ''}
+    ${c.action ? `<div class="act">→ ${c.action}</div>` : ''}
+  </div>`;
+        }
+
+        // ---------- boot ----------
+        async function init() {
+            try {
+                const subs = await get('/api/subjects');
+                if (!subs.length) { showError('No data in the database yet.'); return; }
+                $('subject').innerHTML = subs.map(s =>
+                    `<option value="${s.subject_id}">${s.subject_id} (${s.rows} rows)</option>`).join('');
+                SUBJECT = subs[0].subject_id;
+                $('subject').onchange = e => { SUBJECT = e.target.value; loadAll(); };
+                $('posture').onchange = () => loadAll();
+                loadAll();
+                loadHeat();
+            } catch (e) { showError('Cannot reach the API: ' + e.message); }
+        }
+
+        async function loadAll() {
+            SUBJECT = $('subject').value || SUBJECT;
+            const posture = $('posture').value;
+            $('error').innerHTML = '';
+            try {
+                const [status, base, sess] = await Promise.all([
+                    get(`/api/status/${SUBJECT}?posture=${posture}`),
+                    get(`/api/baseline/${SUBJECT}${posture ? '?posture=' + posture : ''}`),
+                    get(`/api/sessions/${SUBJECT}`)
+                ]);
+                SESSIONS = sess;
+                renderTop(status, base);
+                renderCards(status);
+                renderSessions(sess);
+                renderTrend(sess);
+                const rest = sess.filter(s => (s.context || '').includes('rest'));
+                if (rest.length) loadDetail(rest[rest.length - 1].session_id);
+                $('meta').textContent =
+                    `${sess.length} SESSIONS · ${sess.reduce((a, s) => a + s.windows, 0)} WINDOWS`;
+            } catch (e) { showError(e.message); }
+        }
+
+        function renderTop(status, base) {
+            if (base.ready) {
+                $('bl-mean').innerHTML = `${fmt(base.hr_mean, 1)}<small>bpm</small>`;
+                $('bl-note').textContent =
+                    `sd ${base.hr_sd} · ${base.n_sessions} sessions · ${base.posture || 'all'}`;
+            } else {
+                $('bl-mean').textContent = 'not ready';
+                $('bl-note').textContent = `${base.n_sessions || 0} clean session(s) — needs 2`;
+            }
+
+            if (status.ready) {
+                const l = status.latest;
+                $('lt-hr').innerHTML = `${fmt(l.hr_mean, 1)}<small>bpm</small>`;
+                $('lt-note').textContent =
+                    `${l.session_id} · ${l.pct_usable}% usable · q ${l.q_mean}`;
+
+                const d = status.deviation;
+                if (d.ready) {
+                    const tier = { usual: 0, slight: 1, moderate: 2, marked: 3 }[d.level];
+                    $('dv-delta').innerHTML =
+                        `${d.delta > 0 ? '+' : ''}${fmt(d.delta, 1)}<small>bpm</small>`;
+                    $('dv-note').innerHTML =
+                        `<span class="chip t${tier}">${d.level}</span> z = ${d.z}`;
+                } else {
+                    $('dv-delta').textContent = '—';
+                    $('dv-note').textContent = d.reason || 'baseline not ready';
+                }
+            }
+        }
+
+        function renderCards(status) {
+            const cards = (status.cards || []).filter(c => c.tier > 0);
+            $('cards').innerHTML = cards.length
+                ? cards.map(cardHTML).join('')
+                : `<div class="muted">Nothing flagged from sensor data right now.<br><br>
+       This is not a statement that everything is fine — it means no
+       trend crossed a threshold. Use the manual entry panel below to
+       run the symptom and vitals rules.</div>`;
+        }
+
+        function renderSessions(sess) {
+            $('sess').innerHTML = [...sess].reverse().map(s => `
+    <tr onclick="loadDetail('${s.session_id}')" id="row-${s.session_id}">
+      <td>${s.session_id}</td>
+      <td>${s.context || ''}</td>
+      <td>${s.posture || ''}</td>
+      <td class="n">${s.windows}</td>
+      <td class="n">${s.pct_usable}%</td>
+      <td class="n">${s.q_mean}</td>
+      <td class="n">${fmt(s.hr_mean, 1)}</td>
+      <td class="n">${s.hr_min ? fmt(s.hr_min, 0) + '–' + fmt(s.hr_max, 0) : '—'}</td>
+      <td class="n">${fmt(s.spo2_median, 1)}</td>
+    </tr>`).join('');
+        }
+
+        // ---------- charts ----------
+        function renderTrend(sess) {
+            const rest = sess.filter(s => (s.context || '').includes('rest') && s.hr_mean);
+            const exer = sess.filter(s => (s.context || '').includes('exertion') && s.hr_mean);
+            const labels = sess.filter(s => s.hr_mean).map(s => s.session_id.slice(-9));
+
+            if (trendChart) trendChart.destroy();
+            trendChart = new Chart($('trend'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: 'resting',
+                            data: sess.filter(s => s.hr_mean).map(s =>
+                                (s.context || '').includes('rest') ? s.hr_mean : null),
+                            borderColor: '#7C5CD6', backgroundColor: '#EEE9FB',
+                            borderWidth: 2, tension: .3, spanGaps: true, pointRadius: 4, fill: true
+                        },
+                        {
+                            label: 'post-exertion',
+                            data: sess.filter(s => s.hr_mean).map(s =>
+                                (s.context || '').includes('exertion') ? s.hr_mean : null),
+                            borderColor: '#B87516', backgroundColor: 'transparent',
+                            borderWidth: 2, tension: .3, spanGaps: true, pointRadius: 4,
+                            borderDash: [5, 4]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { font: { size: 11 }, boxWidth: 12 } } },
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'bpm', font: { size: 10 } },
+                            grid: { color: '#EFECF6' }, ticks: { font: { size: 10 } }
+                        },
+                        x: { grid: { display: false }, ticks: { font: { size: 9 }, maxRotation: 45 } }
+                    }
+                }
+            });
+        }
+
+        async function loadDetail(sid) {
+            document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('sel'));
+            const row = $('row-' + sid);
+            if (row) row.classList.add('sel');
+            $('sd-name').textContent = '· ' + sid;
+
+            try {
+                const rows = await get(`/api/session/${sid}`);
+                if (detailChart) detailChart.destroy();
+                detailChart = new Chart($('detail'), {
+                    type: 'line',
+                    data: {
+                        labels: rows.map(r => r.t),
+                        datasets: [
+                            {
+                                label: 'pulse (bpm)', yAxisID: 'y',
+                                data: rows.map(r => r.heart_rate_bpm),
+                                borderColor: '#7C5CD6', borderWidth: 1.6,
+                                pointRadius: 0, tension: .25, spanGaps: false
+                            },
+                            {
+                                label: 'signal quality', yAxisID: 'y1',
+                                data: rows.map(r => r.signal_quality),
+                                borderColor: '#238C7E', borderWidth: 1.2,
+                                pointRadius: 0, tension: .25, borderDash: [3, 3]
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: { legend: { labels: { font: { size: 11 }, boxWidth: 12 } } },
+                        scales: {
+                            y: {
+                                position: 'left', title: { display: true, text: 'bpm', font: { size: 10 } },
+                                grid: { color: '#EFECF6' }, ticks: { font: { size: 10 } }
+                            },
+                            y1: {
+                                position: 'right', min: 0, max: 1,
+                                title: { display: true, text: 'quality', font: { size: 10 } },
+                                grid: { display: false }, ticks: { font: { size: 10 } }
+                            },
+                            x: {
+                                title: { display: true, text: 'seconds', font: { size: 10 } },
+                                grid: { display: false }, ticks: { font: { size: 9 }, maxTicksLimit: 12 }
+                            }
+                        }
+                    }
+                });
+            } catch (e) { showError(e.message); }
+        }
+
+        // ---------- heat ----------
+        async function loadHeat() {
+            try {
+                const h = await get('/api/heat');
+                if (h.error) { $('heat').innerHTML = `<div class="muted">${h.error}</div>`; return; }
+                let out = '<div class="grid g2" style="gap:10px;margin-bottom:12px">';
+                if (h.outdoor) {
+                    out += `<div><div class="muted">Outdoor · ${h.place}</div>
+        <div class="big" style="font-size:24px">${fmt(h.outdoor.temp_c, 1)}<small>°C</small></div>
+        <div class="lbl">${fmt(h.outdoor.humidity, 0)}% humidity</div></div>`;
+                }
+                if (h.belt) {
+                    out += `<div><div class="muted">Under the belt</div>
+        <div class="big" style="font-size:24px">${fmt(h.belt.temp_c, 1)}<small>°C</small></div>
+        <div class="lbl">feels ${fmt(h.belt.feels_c, 1)}°C · ${fmt(h.belt.humidity, 0)}%</div></div>`;
+                }
+                out += '</div>';
+                if (h.guidance) out += cardHTML(h.guidance);
+                if (h.ahead && h.ahead.length) {
+                    out += '<div class="muted" style="margin-top:10px"><b>Hot days ahead:</b> ' +
+                        h.ahead.map(d => `${d.day} ${d.feels_max_c}°C`).join(' · ') + '</div>';
+                }
+                $('heat').innerHTML = out;
+            } catch (e) { $('heat').innerHTML = `<div class="muted">${e.message}</div>`; }
+        }
+
+        // ---------- interactive rules ----------
+        async function runGestosis() {
+            try {
+                const g = await post('/api/gestosis', {
+                    age: +$('p-age').value, bmi: +$('p-bmi').value, map_mmhg: +$('p-map').value,
+                    gestational_weeks: +$('p-wk').value,
+                    primigravida: $('p-primi').checked, art: $('p-art').checked,
+                    prior_pe: $('p-prior').checked, chronic_htn: $('p-htn').checked,
+                    diabetes: $('p-dm').checked, multiple: $('p-multi').checked
+                });
+                $('gest').innerHTML =
+                    `<div class="big" style="font-size:26px;margin-bottom:9px">${g.score}
+       <small>points</small></div>` + cardHTML(g.result);
+            } catch (e) { showError(e.message); }
+        }
+
+        async function runAssess() {
+            const boxes = document.querySelectorAll('.card:last-of-type .checks input[value]');
+            const symptoms = [...boxes].filter(b => b.checked).map(b => b.value);
+            const num = id => $(id).value === '' ? null : +$(id).value;
+            try {
+                const r = await post(`/api/assess/${SUBJECT}?gestational_weeks=${+$('p-wk').value}`, {
+                    temp_c: num('m-temp'), sbp: num('m-sbp'), dbp: num('m-dbp'),
+                    weight_gain_kg: num('m-wt'), prior_hb: num('m-hb'),
+                    ifa_missed_days: +$('m-ifa').value || 0,
+                    symptoms, fluid_leak: $('m-leak').checked
+                });
+                $('assess').innerHTML = r.cards.length
+                    ? r.cards.map(cardHTML).join('')
+                    : '<div class="muted">Nothing entered to assess.</div>';
+            } catch (e) { showError(e.message); }
+        }
+
+        function downloadReport() { window.open(`/api/report/${SUBJECT}`, '_blank'); }
+
+        init();
+    </script>
+</body>
+
+</html>

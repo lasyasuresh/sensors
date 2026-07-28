@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="theme-color" content="#F6F4FA">
+    <title>Garbha Sethu</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F6F4FA;
+            --card: #fff;
+            --ink: #241E36;
+            --muted: #7C7590;
+            --hair: #EAE6F2;
+            --violet: #7C5CD6;
+            --violet-2: #9B7BE8;
+            --violet-soft: #EEE9FB;
+            --teal: #238C7E;
+            --teal-soft: #E1F2EF;
+            --amber: #B87516;
+            --amber-soft: #FBF0DC;
+            --coral: #B93F3F;
+            --coral-soft: #FBE8E7;
+            --sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --display: 'Bricolage Grotesque', system-ui, sans-serif;
+            --mono: 'IBM Plex Mono', ui-monospace, monospace;
+            --nav-h: 76px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden
+        }
+
+        body {
+            font-family: var(--sans);
+            color: var(--ink);
+            background: #DCD4EC;
+            display: grid;
+            place-items: center;
+        }
+
+        /* ---------- device frame (desktop only) ---------- */
+        #app {
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media(min-width:560px) {
+            #app {
+                width: min(430px, 42vh);
+                height: min(932px, 96vh);
+                border-radius: 40px;
+                box-shadow: 0 34px 80px -24px rgba(46, 32, 84, .5);
+                border: 1px solid rgba(255, 255, 255, .5)
+            }
+        }
+
+        /* ---------- screens ---------- */
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            background: var(--bg);
+        }
+
+        .screen.on {
+            display: flex;
+            animation: slide .34s cubic-bezier(.22, .9, .3, 1)
+        }
+
+        .screen.back.on {
+            animation: slideBack .3s cubic-bezier(.22, .9, .3, 1)
+        }
+
+        @keyframes slide {
+            from {
+                opacity: 0;
+                transform: translateX(18px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        @keyframes slideBack {
+            from {
+                opacity: 0;
+                transform: translateX(-18px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .body {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0 20px;
+            -webkit-overflow-scrolling: touch
+        }
+
+        .body.pad {
+            padding-bottom: calc(var(--nav-h) + 20px)
+        }
+
+        .body::-webkit-scrollbar {
+            display: none
+        }
+
+        /* ---------- top bar ---------- */
+        .top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 20px 10px;
+            flex: none;
+        }
+
+        .top .back {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid var(--hair);
+            display: grid;
+            place-items: center;
+            font-size: 17px;
+            cursor: pointer;
+            flex: none;
+            color: var(--ink)
+        }
+
+        .top h1 {
+            font-family: var(--display);
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -.01em;
+            flex: 1
+        }
+
+        .top .sub {
+            font-family: var(--mono);
+            font-size: 9.5px;
+            color: var(--muted);
+            letter-spacing: .11em;
+            text-transform: uppercase;
+            margin-top: 2px
+        }
+
+        /* ---------- type ---------- */
+        h2.big {
+            font-family: var(--display);
+            font-size: 27px;
+            font-weight: 800;
+            letter-spacing: -.02em;
+            line-height: 1.12
+        }
+
+        .lede {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-top: 9px
+        }
+
+        .sect {
+            font-family: var(--mono);
+            font-size: 9.5px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin: 22px 2px 10px
+        }
+
+        .num {
+            font-family: var(--mono);
+            font-weight: 600;
+            letter-spacing: -.02em
+        }
+
+        /* ---------- components ---------- */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--hair);
+            border-radius: 19px;
+            padding: 16px
+        }
+
+        .card+.card {
+            margin-top: 10px
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            font-size: 18px;
+            flex: none;
+            background: var(--violet-soft)
+        }
+
+        .ttl {
+            font-size: 14.5px;
+            font-weight: 600;
+            line-height: 1.3
+        }
+
+        .sm {
+            font-size: 12.5px;
+            color: var(--muted);
+            line-height: 1.45;
+            margin-top: 2px
+        }
+
+        .chip {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            padding: 4px 9px;
+            border-radius: 99px;
+            font-weight: 600;
+            white-space: nowrap;
+            display: inline-block
+        }
+
+        .t0 {
+            background: #F2F0F7;
+            color: var(--muted)
+        }
+
+        .t1 {
+            background: var(--teal-soft);
+            color: var(--teal)
+        }
+
+        .t2 {
+            background: var(--amber-soft);
+            color: var(--amber)
+        }
+
+        .t3 {
+            background: var(--coral-soft);
+            color: var(--coral)
+        }
+
+        button,
+        .btn {
+            font-family: var(--sans);
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 15px;
+            padding: 15px;
+            background: var(--ink);
+            color: #fff;
+            width: 100%;
+            cursor: pointer;
+            display: block;
+            text-align: center
+        }
+
+        button:disabled {
+            opacity: .32;
+            cursor: not-allowed
+        }
+
+        .btn.ghost {
+            background: #fff;
+            color: var(--ink);
+            border: 1px solid var(--hair)
+        }
+
+        .btn.soft {
+            background: var(--violet-soft);
+            color: var(--violet)
+        }
+
+        .btn.sm {
+            padding: 11px;
+            font-size: 13.5px;
+            border-radius: 12px
+        }
+
+        input,
+        select {
+            font-family: var(--sans);
+            font-size: 15px;
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--hair);
+            border-radius: 14px;
+            background: #fff;
+            color: var(--ink)
+        }
+
+        input:focus,
+        select:focus {
+            outline: 2px solid var(--violet-soft);
+            border-color: var(--violet)
+        }
+
+        label.f {
+            display: block;
+            font-size: 12px;
+            color: var(--muted);
+            margin: 0 0 6px 3px
+        }
+
+        .field+.field {
+            margin-top: 12px
+        }
+
+        .two {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px
+        }
+
+        /* toggle rows */
+        .tog {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff;
+            border: 1px solid var(--hair);
+            border-radius: 14px;
+            padding: 13px 14px;
+            cursor: pointer;
+            user-select: none
+        }
+
+        .tog+.tog {
+            margin-top: 8px
+        }
+
+        .tog .box {
+            width: 22px;
+            height: 22px;
+            border-radius: 7px;
+            border: 2px solid var(--hair);
+            flex: none;
+            display: grid;
+            place-items: center;
+            font-size: 12px;
+            color: #fff;
+            transition: .15s
+        }
+
+        .tog.on {
+            border-color: var(--violet);
+            background: var(--violet-soft)
+        }
+
+        .tog.on .box {
+            background: var(--violet);
+            border-color: var(--violet)
+        }
+
+        .tog span {
+            font-size: 13.5px;
+            line-height: 1.4
+        }
+
+        /* alert card */
+        .alert {
+            border-radius: 18px;
+            padding: 17px;
+            border: 1px solid var(--hair);
+            background: #fff
+        }
+
+        .alert+.alert {
+            margin-top: 10px
+        }
+
+        .alert.a1 {
+            background: var(--teal-soft);
+            border-color: #CFE8E3
+        }
+
+        .alert.a2 {
+            background: var(--amber-soft);
+            border-color: #F0DFBE
+        }
+
+        .alert.a3 {
+            background: var(--coral-soft);
+            border-color: #F2CFCD
+        }
+
+        .alert h3 {
+            font-family: var(--display);
+            font-size: 17px;
+            font-weight: 800;
+            margin: 10px 0 7px;
+            letter-spacing: -.01em;
+            line-height: 1.25
+        }
+
+        .alert p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #5A5268
+        }
+
+        .alert ul {
+            list-style: none;
+            margin-top: 11px;
+            background: rgba(255, 255, 255, .62);
+            border-radius: 12px;
+            padding: 10px 12px
+        }
+
+        .alert li {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: #5A5268;
+            padding: 3px 0 3px 12px;
+            position: relative;
+            line-height: 1.5
+        }
+
+        .alert li::before {
+            content: '·';
+            position: absolute;
+            left: 2px;
+            font-size: 15px;
+            top: -1px
+        }
+
+        .alert .act {
+            margin-top: 12px
+        }
+
+        /* bottom nav */
+        .nav {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: var(--nav-h);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 8px 14px;
+            background: rgba(255, 255, 255, .93);
+            backdrop-filter: blur(14px);
+            border-top: 1px solid var(--hair);
+            z-index: 20
+        }
+
+        .nav a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--muted);
+            text-decoration: none;
+            padding: 8px 12px;
+            cursor: pointer
+        }
+
+        .nav a .i {
+            font-size: 19px;
+            opacity: .45;
+            transition: .15s
+        }
+
+        .nav a .t {
+            font-size: 9.5px;
+            font-weight: 500
+        }
+
+        .nav a.on {
+            color: var(--violet)
+        }
+
+        .nav a.on .i {
+            opacity: 1
+        }
+
+        /* ---------- splash ---------- */
+        #s-splash {
+            background: #C3A996;
+            padding: 0;
+            overflow: hidden
+        }
+
+        #s-splash video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            background: #C3A996;
+            display: block
+        }
+
+        #skip {
+            position: absolute;
+            bottom: 38px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, .96);
+            background: rgba(255, 255, 255, .14);
+            backdrop-filter: blur(16px) saturate(150%);
+            -webkit-backdrop-filter: blur(16px) saturate(150%);
+            padding: 11px 24px;
+            border-radius: 99px;
+            cursor: pointer;
+            z-index: 6;
+            opacity: 0;
+            transition: opacity .6s;
+            border: 1px solid rgba(255, 255, 255, .34);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, .14)
+        }
+
+        #skip.show {
+            opacity: 1
+        }
+
+        /* ---------- watch rows ---------- */
+        .wrow {
+            background: #fff;
+            border: 1px solid var(--hair);
+            border-radius: 18px;
+            padding: 15px;
+            margin-top: 9px
+        }
+
+        .wrow.on2 {
+            background: var(--amber-soft);
+            border-color: #F0DFBE
+        }
+
+        .wrow.on3 {
+            background: var(--coral-soft);
+            border-color: #F2CFCD
+        }
+
+        .wrow .hd {
+            display: flex;
+            align-items: center;
+            gap: 11px
+        }
+
+        .wrow .nm {
+            font-size: 14.5px;
+            font-weight: 600;
+            flex: 1;
+            line-height: 1.3
+        }
+
+        .feeds {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 11px
+        }
+
+        .feed {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .05em;
+            padding: 4px 8px;
+            border-radius: 7px;
+            background: #F4F1FA;
+            color: var(--muted);
+            border: 1px solid var(--hair)
+        }
+
+        .feed.live {
+            background: var(--violet-soft);
+            color: var(--violet);
+            border-color: #DCD1F6
+        }
+
+        .feed.miss {
+            opacity: .5;
+            text-decoration: line-through
+        }
+
+        .wrow .say {
+            font-size: 12.5px;
+            color: var(--muted);
+            line-height: 1.55;
+            margin-top: 10px
+        }
+
+        .meter {
+            height: 5px;
+            background: var(--hair);
+            border-radius: 99px;
+            margin-top: 11px;
+            overflow: hidden
+        }
+
+        .meter i {
+            display: block;
+            height: 100%;
+            border-radius: 99px;
+            background: var(--violet);
+            transition: width .6s
+        }
+
+        /* ---------- home character ---------- */
+        .hero {
+            background: linear-gradient(150deg, #7C5CD6, #9B7BE8 62%, #B49CF0);
+            border-radius: 26px;
+            padding: 20px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+            min-height: 190px;
+            display: flex;
+            align-items: flex-end
+        }
+
+        .hero .art {
+            position: absolute;
+            right: -14px;
+            bottom: -8px;
+            width: 172px;
+            opacity: .96
+        }
+
+        .hero .txt {
+            position: relative;
+            z-index: 2;
+            max-width: 63%
+        }
+
+        .hero .wk {
+            font-family: var(--mono);
+            font-size: 9.5px;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+            opacity: .8
+        }
+
+        .hero .h {
+            font-family: var(--display);
+            font-size: 23px;
+            font-weight: 800;
+            margin: 8px 0 5px;
+            letter-spacing: -.01em;
+            line-height: 1.15
+        }
+
+        .hero .p {
+            font-size: 12.5px;
+            opacity: .88;
+            line-height: 1.5
+        }
+
+        .float {
+            animation: float 5.5s ease-in-out infinite
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-7px)
+            }
+        }
+
+        .breathe {
+            transform-origin: center;
+            animation: breathe 4.4s ease-in-out infinite
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                transform: scale(1)
+            }
+
+            50% {
+                transform: scale(1.028)
+            }
+        }
+
+        /* freshness strip - never a green tick */
+        .fresh {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            background: #fff;
+            border: 1px solid var(--hair);
+            border-radius: 14px;
+            padding: 10px 13px;
+            margin-top: 10px
+        }
+
+        .fresh .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--violet);
+            box-shadow: 0 0 0 4px var(--violet-soft);
+            flex: none
+        }
+
+        .fresh span {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--muted);
+            letter-spacing: .04em
+        }
+
+        /* tiles */
+        .tiles {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px
+        }
+
+        .tile {
+            background: #fff;
+            border: 1px solid var(--hair);
+            border-radius: 18px;
+            padding: 15px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            min-height: 102px;
+            cursor: pointer
+        }
+
+        .tile:active {
+            transform: scale(.98)
+        }
+
+        .tile .icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            font-size: 17px
+        }
+
+        .tile b {
+            font-size: 13.5px;
+            font-weight: 600
+        }
+
+        .tile em {
+            font-style: normal;
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        /* live reading */
+        .live {
+            background: #1B1626;
+            border-radius: 22px;
+            padding: 19px;
+            color: #fff
+        }
+
+        .live .k {
+            font-family: var(--mono);
+            font-size: 9.5px;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+            opacity: .5
+        }
+
+        .live .v {
+            font-family: var(--mono);
+            font-size: 40px;
+            font-weight: 600;
+            letter-spacing: -.03em;
+            line-height: 1;
+            margin-top: 6px
+        }
+
+        .live .v small {
+            font-size: 13px;
+            opacity: .55;
+            font-family: var(--sans);
+            margin-left: 4px
+        }
+
+        .wave {
+            display: flex;
+            align-items: flex-end;
+            gap: 2.5px;
+            height: 40px;
+            margin-top: 16px
+        }
+
+        .wave i {
+            flex: 1;
+            background: rgba(255, 255, 255, .32);
+            border-radius: 2px;
+            transition: height .25s
+        }
+
+        .qual {
+            display: flex;
+            gap: 3px;
+            margin-top: 14px
+        }
+
+        .qual i {
+            height: 3px;
+            flex: 1;
+            border-radius: 99px;
+            background: rgba(255, 255, 255, .16);
+            transition: .3s
+        }
+
+        .qual i.on {
+            background: #8FE3D2
+        }
+
+        .stat {
+            background: #fff;
+            border: 1px solid var(--hair);
+            border-radius: 16px;
+            padding: 14px
+        }
+
+        .stat .k {
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: .11em;
+            text-transform: uppercase;
+            color: var(--muted)
+        }
+
+        .stat .v {
+            font-family: var(--mono);
+            font-size: 22px;
+            font-weight: 600;
+            margin-top: 6px;
+            letter-spacing: -.02em
+        }
+
+        .stat .v small {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 400
+        }
+
+        /* gauge */
+        .gauge {
+            height: 9px;
+            border-radius: 99px;
+            background: linear-gradient(90deg, #238C7E, #D9A93A 55%, #C2453F);
+            position: relative;
+            margin: 14px 0 7px
+        }
+
+        .gauge i {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid var(--amber);
+            transition: left .6s
+        }
+
+        .scale {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--mono);
+            font-size: 8.5px;
+            color: var(--muted)
+        }
+
+        .fore {
+            display: flex;
+            gap: 7px;
+            margin-top: 10px
+        }
+
+        .day {
+            flex: 1;
+            background: #fff;
+            border: 1px solid var(--hair);
+            border-radius: 13px;
+            padding: 10px 4px;
+            text-align: center
+        }
+
+        .day .d {
+            font-family: var(--mono);
+            font-size: 8.5px;
+            color: var(--muted);
+            letter-spacing: .06em
+        }
+
+        .day .t {
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 4px
+        }
+
+        .day.hot {
+            background: var(--amber-soft);
+            border-color: #F0DFBE
+        }
+
+        .day.hot .t {
+            color: var(--amber)
+        }
+
+        .chartbox {
+            position: relative;
+            height: 190px;
+            margin-top: 6px
+        }
+
+        .muted {
+            font-size: 12.5px;
+            color: var(--muted);
+            line-height: 1.65
+        }
+
+        .spin {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--muted);
+            padding: 14px 0
+        }
+
+        .err {
+            background: var(--coral-soft);
+            color: var(--coral);
+            padding: 12px 14px;
+            border-radius: 13px;
+            font-size: 12.5px;
+            margin-bottom: 10px
+        }
+
+        /* progress dots */
+        .dots {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin: 20px 0 4px
+        }
+
+        .dots i {
+            width: 7px;
+            height: 7px;
+            border-radius: 99px;
+            background: var(--hair);
+            transition: .25s
+        }
+
+        .dots i.on {
+            background: var(--violet);
+            width: 22px
+        }
+
+        /* timer */
+        .timer {
+            text-align: center;
+            padding: 12px 0
+        }
+
+        .timer .t {
+            font-family: var(--mono);
+            font-size: 52px;
+            font-weight: 600;
+            letter-spacing: -.04em
+        }
+
+        .timer .l {
+            font-size: 12.5px;
+            color: var(--muted);
+            margin-top: 5px
+        }
+
+        .taps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 14px;
+            justify-content: center
+        }
+
+        .taps b {
+            font-family: var(--mono);
+            font-size: 11px;
+            background: var(--violet-soft);
+            color: var(--violet);
+            padding: 5px 9px;
+            border-radius: 8px;
+            font-weight: 600
+        }
+
+        .footnote {
+            font-size: 11px;
+            color: var(--muted);
+            line-height: 1.65;
+            margin-top: 20px;
+            padding: 14px;
+            background: #F1EEF8;
+            border-radius: 14px
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+        <!-- ══════════════════ SPLASH ══════════════════ -->
+        <section class="screen on" id="s-splash" onclick="endSplash()">
+            <video id="logo-vid" autoplay muted playsinline preload="auto">
+                <source src="/logo.mp4" type="video/mp4">
+            </video>
+            <div id="skip" onclick="endSplash()">Skip</div>
+        </section>
+
+        <!-- ══════════════════ TERMS ══════════════════ -->
+        <section class="screen" id="s-terms">
+            <div class="body" style="padding-top:34px">
+                <h2 class="big">Before we start</h2>
+                <p class="lede">Three things you need to know. Please read them — they matter.</p>
+
+                <div class="sect">Please confirm</div>
+                <div class="tog" onclick="tog(this,'ack1')">
+                    <div class="box">✓</div>
+                    <span><b>Garbha Sethu is not a doctor.</b> It cannot diagnose anything. It looks for changes worth
+                        mentioning at your next visit.</span>
+                </div>
+                <div class="tog" onclick="tog(this,'ack2')">
+                    <div class="box">✓</div>
+                    <span><b>No alert does not mean you are well.</b> If something feels wrong, contact your doctor
+                        whether or not this app says anything.</span>
+                </div>
+                <div class="tog" onclick="tog(this,'ack3')">
+                    <div class="box">✓</div>
+                    <span><b>In an emergency, do not open this app.</b> Call your provider or go to hospital.</span>
+                </div>
+
+                <div class="footnote">
+                    The belt uses an optical pulse sensor and an air temperature sensor. Pulse and oxygen
+                    readings are uncalibrated and shown as trends only. Temperature and humidity describe
+                    the air around you, not your body temperature. Your data stays on your device and your
+                    own account.
+                </div>
+
+                <button id="btn-terms" disabled onclick="go('s-login')" style="margin:18px 0 24px">I understand,
+                    continue</button>
+            </div>
+        </section>
+
+        <!-- ══════════════════ LOGIN ══════════════════ -->
+        <section class="screen" id="s-login">
+            <div class="body" style="padding-top:44px">
+                <svg viewBox="0 0 120 120" width="62" height="62" fill="none" style="margin-bottom:22px">
+                    <circle cx="60" cy="60" r="52" stroke="#DDD3F5" stroke-width="2" />
+                    <path d="M22 62 H40 L46 44 L54 78 L62 52 L68 66 H98" stroke="#7C5CD6" stroke-width="4.5"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <h2 class="big">Welcome</h2>
+                <p class="lede">Sign in to pick up where you left off.</p>
+
+                <div style="margin-top:26px">
+                    <div class="field"><label class="f">Your name</label>
+                        <input id="in-name" placeholder="Priya" value="Priya">
+                    </div>
+                    <div class="field"><label class="f">Mobile number</label>
+                        <input id="in-phone" type="tel" placeholder="98xxx xxxxx" value="98765 43210">
+                    </div>
+                </div>
+
+                <button onclick="login()" style="margin-top:20px">Continue</button>
+                <p class="muted" style="text-align:center;margin-top:16px;font-size:11.5px">
+                    Demo build — no real account is created.</p>
+            </div>
+        </section>
+
+        <!-- ══════════════════ ONBOARDING ══════════════════ -->
+        <section class="screen" id="s-onboard">
+            <div class="top">
+                <div class="back" onclick="obBack()">←</div>
+                <div>
+                    <h1 id="ob-title">About you</h1>
+                    <div class="sub" id="ob-step">STEP 1 OF 3</div>
+                </div>
+            </div>
+            <div class="body">
+                <div class="dots"><i class="on"></i><i></i><i></i></div>
+
+                <!-- step 1 -->
+                <div class="ob" data-step="1">
+                    <p class="lede" style="margin-bottom:20px">This sets your personal baseline. Nothing is shared.</p>
+                    <div class="two">
+                        <div class="field"><label class="f">Age</label><input type="number" id="p-age" value="27"></div>
+                        <div class="field"><label class="f">Weight (kg)</label><input type="number" step="0.1" id="p-wt"
+                                value="64"></div>
+                    </div>
+                    <div class="two" style="margin-top:12px">
+                        <div class="field"><label class="f">Height (cm)</label><input type="number" id="p-ht"
+                                value="158"></div>
+                        <div class="field"><label class="f">BMI</label><input id="p-bmi" readonly
+                                style="background:#F7F5FB"></div>
+                    </div>
+                </div>
+
+                <!-- step 2 -->
+                <div class="ob" data-step="2" style="display:none">
+                    <p class="lede" style="margin-bottom:20px">Gestational age decides which rules apply — especially
+                        for contractions.</p>
+                    <div class="two">
+                        <div class="field"><label class="f">Weeks pregnant</label><input type="number" id="p-wk"
+                                value="28"></div>
+                        <div class="field"><label class="f">Days</label><input type="number" id="p-dy" value="3"></div>
+                    </div>
+                    <div class="field" style="margin-top:12px"><label class="f">Blood pressure (from your cuff)</label>
+                        <div class="two"><input type="number" id="p-sbp" placeholder="Systolic" value="118">
+                            <input type="number" id="p-dbp" placeholder="Diastolic" value="76">
+                        </div>
+                    </div>
+                    <div class="tog on" style="margin-top:12px" onclick="tog(this,'primi')">
+                        <div class="box">✓</div>
+                        <span>This is my first pregnancy</span>
+                    </div>
+                </div>
+
+                <!-- step 3 -->
+                <div class="ob" data-step="3" style="display:none">
+                    <p class="lede" style="margin-bottom:20px">Tick anything that applies. This is the FOGSI gestosis
+                        score, used across India to decide who needs closer watching.</p>
+                    <div class="tog" onclick="tog(this,'prior_pe')">
+                        <div class="box">✓</div><span>Pre-eclampsia in a past pregnancy</span>
+                    </div>
+                    <div class="tog" onclick="tog(this,'chronic_htn')">
+                        <div class="box">✓</div><span>High blood pressure before pregnancy</span>
+                    </div>
+                    <div class="tog" onclick="tog(this,'diabetes')">
+                        <div class="box">✓</div><span>Diabetes</span>
+                    </div>
+                    <div class="tog" onclick="tog(this,'multiple')">
+                        <div class="box">✓</div><span>Twins or more</span>
+                    </div>
+                    <div class="tog" onclick="tog(this,'art')">
+                        <div class="box">✓</div><span>IVF or fertility treatment</span>
+                    </div>
+                    <div class="tog" onclick="tog(this,'family_pe')">
+                        <div class="box">✓</div><span>Mother or sister had pre-eclampsia</span>
+                    </div>
+                </div>
+
+                <button id="ob-next" onclick="obNext()" style="margin:22px 0 24px">Continue</button>
+            </div>
+        </section>
+
+        <!-- ══════════════════ HOME ══════════════════ -->
+        <section class="screen" id="s-home">
+            <div class="body pad" style="padding-top:22px">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+                    <div>
+                        <h1 style="font-family:var(--display);font-size:21px;font-weight:800" id="hi">Good morning</h1>
+                        <div class="sub"
+                            style="font-family:var(--mono);font-size:9.5px;color:var(--muted);letter-spacing:.11em;text-transform:uppercase;margin-top:3px"
+                            id="wk-label">WEEK 28 · DAY 3</div>
+                    </div>
+                    <div class="icon" onclick="go('s-profile')" style="cursor:pointer">🌿</div>
+                </div>
+
+                <div class="hero">
+                    <div class="txt">
+                        <div class="wk">Today</div>
+                        <div class="h" id="home-h">2 checks left</div>
+                        <div class="p" id="home-p">Take a belt reading when you have five quiet minutes.</div>
+                    </div>
+                    <svg class="art float" viewBox="0 0 200 210" fill="none">
+                        <ellipse cx="104" cy="200" rx="62" ry="9" fill="rgba(0,0,0,.09)" />
+                        <g class="breathe">
+                            <path d="M60 205c-4-46 6-76 22-92 10-10 24-14 36-12 22 4 34 22 36 46 2 26-4 42-6 58z"
+                                fill="#F6EDE4" />
+                            <path d="M74 132c-10 16-13 42-14 73h96c-2-32-6-56-14-72-8-16-24-24-36-24s-24 8-32 23z"
+                                fill="#B49CF0" />
+                            <ellipse cx="122" cy="146" rx="30" ry="27" fill="#C7B2F5" />
+                            <path d="M92 152c-5 12-5 30-4 53" stroke="#9B7BE8" stroke-width="2.4"
+                                stroke-linecap="round" />
+                            <circle cx="104" cy="72" r="27" fill="#F6EDE4" />
+                            <path
+                                d="M77 68c-2-19 10-32 27-32s29 12 28 30c-1 8-4 8-6 2-2-7-9-12-22-12-11 0-19 4-23 12-2 5-4 6-4 0z"
+                                fill="#4A3B33" />
+                            <path d="M131 66c6 3 9 12 8 24-1 14-6 22-11 22" fill="#4A3B33" />
+                            <path d="M73 66c-5 4-7 14-6 25 1 13 6 21 11 21" fill="#4A3B33" />
+                            <circle cx="94" cy="74" r="2.6" fill="#3A2E28" />
+                            <circle cx="114" cy="74" r="2.6" fill="#3A2E28" />
+                            <path d="M99 85q5 5 10 0" stroke="#3A2E28" stroke-width="2.2" stroke-linecap="round" />
+                            <ellipse cx="86" cy="81" rx="5" ry="3.4" fill="#EFB6B0" opacity=".62" />
+                            <ellipse cx="122" cy="81" rx="5" ry="3.4" fill="#EFB6B0" opacity=".62" />
+                            <path d="M104 99v10" stroke="#F6EDE4" stroke-width="11" stroke-linecap="round" />
+                            <path d="M133 156c8 4 12 12 11 22" stroke="#F6EDE4" stroke-width="10"
+                                stroke-linecap="round" />
+                            <circle cx="142" cy="181" r="6.5" fill="#F6EDE4" />
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="fresh"><i class="dot"></i><span id="fresh">NO READING YET TODAY</span></div>
+
+                <div class="sect">Needs you</div>
+                <div id="todo"></div>
+
+                <div class="sect">What the system is saying</div>
+                <div id="home-alerts">
+                    <div class="spin">checking…</div>
+                </div>
+
+                <div class="footnote" style="margin-bottom:8px">
+                    Garbha Sethu never shows an all-clear. A quiet screen means nothing crossed a
+                    threshold — it is not a statement that you are well.
+                </div>
+            </div>
+            <nav class="nav" id="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ LOG ══════════════════ -->
+        <section class="screen" id="s-log">
+            <div class="top">
+                <div>
+                    <h1>Log something</h1>
+                    <div class="sub">TAP ONCE · NOTHING IS SHARED</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <div class="tiles">
+                    <div class="tile" onclick="go('s-contract')">
+                        <div class="icon" style="background:var(--coral-soft)">⏱</div><b>Contractions</b><em>Start
+                            timer</em>
+                    </div>
+                    <div class="tile" onclick="leak()">
+                        <div class="icon" style="background:var(--coral-soft)">💦</div><b>Fluid leak</b><em>Any
+                            amount</em>
+                    </div>
+                    <div class="tile" onclick="go('s-vitals')">
+                        <div class="icon" style="background:var(--amber-soft)">🩺</div><b>Blood pressure</b><em>From
+                            your cuff</em>
+                    </div>
+                    <div class="tile" onclick="go('s-vitals')">
+                        <div class="icon" style="background:var(--amber-soft)">🌡</div><b>Temperature</b><em>From
+                            thermometer</em>
+                    </div>
+                    <div class="tile" onclick="go('s-symptoms')">
+                        <div class="icon">📋</div><b>How you feel</b><em>Quick checklist</em>
+                    </div>
+                    <div class="tile" onclick="go('s-reading')">
+                        <div class="icon">💜</div><b>Belt reading</b><em>5 minutes</em>
+                    </div>
+                    <div class="tile" onclick="go('s-vitals')">
+                        <div class="icon">⚖️</div><b>Weight</b><em>Weekly</em>
+                    </div>
+                    <div class="tile" onclick="go('s-vitals')">
+                        <div class="icon">💊</div><b>Iron tablet</b><em>Taken today?</em>
+                    </div>
+                </div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ BELT READING ══════════════════ -->
+        <section class="screen" id="s-reading">
+            <div class="top">
+                <div class="back" onclick="go('s-log',1)">←</div>
+                <div>
+                    <h1>Belt reading</h1>
+                    <div class="sub" id="rd-sub">HOLD STILL</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <div class="live">
+                    <div class="k">Pulse</div>
+                    <div class="v" id="rd-hr">—<small>bpm</small></div>
+                    <div class="wave" id="rd-wave"></div>
+                    <div class="qual" id="rd-qual"><i></i><i></i><i></i><i></i><i></i></div>
+                </div>
+                <div class="two" style="margin-top:10px">
+                    <div class="stat">
+                        <div class="k">Oxygen · trend</div>
+                        <div class="v" id="rd-spo2">—<small>%</small></div>
+                        <div class="sm" style="font-size:11px">uncalibrated</div>
+                    </div>
+                    <div class="stat">
+                        <div class="k">Under-belt air</div>
+                        <div class="v" id="rd-temp">—<small>°C</small></div>
+                        <div class="sm" style="font-size:11px" id="rd-hum">—</div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top:10px">
+                    <div class="ttl">Getting a clean reading</div>
+                    <div class="sm" style="margin-top:7px">Rest your finger flat on the sensor with light pressure —
+                        pressing hard squeezes the blood out. Cover both lights. Sit still and breathe normally.</div>
+                </div>
+                <button class="btn soft" onclick="simulate()" style="margin-top:12px">Start reading</button>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ VITALS ENTRY ══════════════════ -->
+        <section class="screen" id="s-vitals">
+            <div class="top">
+                <div class="back" onclick="go('s-log',1)">←</div>
+                <div>
+                    <h1>From your instruments</h1>
+                    <div class="sub">MEASURED VALUES ONLY</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <div class="two">
+                    <div class="field"><label class="f">Temperature °C</label><input type="number" step="0.1"
+                            id="m-temp" placeholder="37.0"></div>
+                    <div class="field"><label class="f">Weight gain kg/wk</label><input type="number" step="0.1"
+                            id="m-wt" placeholder="0.4"></div>
+                </div>
+                <div class="two" style="margin-top:12px">
+                    <div class="field"><label class="f">Systolic</label><input type="number" id="m-sbp"
+                            placeholder="120"></div>
+                    <div class="field"><label class="f">Diastolic</label><input type="number" id="m-dbp"
+                            placeholder="78"></div>
+                </div>
+                <div class="two" style="margin-top:12px">
+                    <div class="field"><label class="f">Last Hb g/dL</label><input type="number" step="0.1" id="m-hb"
+                            placeholder="11.5"></div>
+                    <div class="field"><label class="f">Iron missed (days)</label><input type="number" id="m-ifa"
+                            value="0"></div>
+                </div>
+                <button onclick="runAssess()" style="margin-top:18px">Save and check</button>
+                <div id="v-out" style="margin-top:14px"></div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ SYMPTOMS ══════════════════ -->
+        <section class="screen" id="s-symptoms">
+            <div class="top">
+                <div class="back" onclick="go('s-log',1)">←</div>
+                <div>
+                    <h1>How you feel</h1>
+                    <div class="sub">TICK ANYTHING FROM TODAY</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <p class="lede" style="margin-bottom:18px">Some of these are warning signs when they come together. Be
+                    honest — over-reporting is fine.</p>
+                <div id="sym-list"></div>
+                <button onclick="runAssess()" style="margin-top:18px">Check these</button>
+                <div id="sym-out" style="margin-top:14px"></div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ CONTRACTIONS ══════════════════ -->
+        <section class="screen" id="s-contract">
+            <div class="top">
+                <div class="back" onclick="go('s-log',1)">←</div>
+                <div>
+                    <h1>Contraction timer</h1>
+                    <div class="sub" id="ct-sub">TAP AT THE START OF EACH ONE</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <div class="card">
+                    <div class="timer">
+                        <div class="t" id="ct-time">00:00</div>
+                        <div class="l" id="ct-label">Not started</div>
+                    </div>
+                    <div class="taps" id="ct-taps"></div>
+                </div>
+                <button onclick="ctTap()" style="margin-top:12px">Contraction started</button>
+                <button class="btn ghost" onclick="ctCheck()" style="margin-top:8px">Check the pattern</button>
+                <button class="btn ghost" onclick="ctReset()" style="margin-top:8px">Reset</button>
+                <div id="ct-out" style="margin-top:14px"></div>
+                <div class="footnote">
+                    The 5-1-1 rule only applies from 37 weeks. Before that, any regular
+                    pattern should be checked straight away — so Garbha Sethu uses your
+                    gestational age, not a fixed rule.
+                </div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ WATCH ══════════════════ -->
+        <section class="screen" id="s-watch">
+            <div class="top">
+                <div>
+                    <h1>What we watch</h1>
+                    <div class="sub" id="w-sub">SIX SIGNALS, COMBINED</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <p class="lede" style="margin-bottom:4px">Each row combines more than one input. No single sensor
+                    decides anything on its own.</p>
+                <div id="w-list">
+                    <div class="spin">checking…</div>
+                </div>
+
+                <div class="sect">Signal quality model</div>
+                <div id="w-ml">
+                    <div class="spin">scoring…</div>
+                </div>
+
+                <div class="footnote">
+                    Rows turn amber when something is worth confirming and red only when a published clinical
+                    rule fires on a value you measured with a real instrument. Sensor readings alone never
+                    reach red.
+                </div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ HEAT ══════════════════ -->
+        <section class="screen" id="s-heat">
+            <div class="top">
+                <div>
+                    <h1>Heat today</h1>
+                    <div class="sub" id="ht-place">LOADING</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <div id="ht-body">
+                    <div class="spin">loading…</div>
+                </div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ TRENDS ══════════════════ -->
+        <section class="screen" id="s-trends">
+            <div class="top">
+                <div>
+                    <h1>Your trends</h1>
+                    <div class="sub" id="tr-sub">FROM YOUR OWN READINGS</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <div id="tr-top"></div>
+                <div class="card" style="margin-top:10px">
+                    <div class="sect" style="margin:0 0 4px">Resting pulse by session</div>
+                    <div class="chartbox"><canvas id="c-trend"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="sect" style="margin:0 0 4px">Latest session <span id="tr-name"
+                            style="text-transform:none;letter-spacing:0"></span></div>
+                    <div class="chartbox"><canvas id="c-detail"></canvas></div>
+                    <div class="sm" style="margin-top:8px">Dashed line is signal quality. Where it drops, Garbha Sethu
+                        reports nothing rather than guessing.</div>
+                </div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ PROFILE / REPORT ══════════════════ -->
+        <section class="screen" id="s-profile">
+            <div class="top">
+                <div class="back" onclick="go('s-home',1)">←</div>
+                <div>
+                    <h1>You &amp; your report</h1>
+                    <div class="sub" id="pr-sub">—</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <div class="card">
+                    <div class="row">
+                        <div class="icon">📄</div>
+                        <div style="flex:1">
+                            <div class="ttl">Summary for your visit</div>
+                            <div class="sm">One page, four weeks of readings</div>
+                        </div>
+                    </div>
+                    <button class="btn sm" onclick="downloadReport()" style="margin-top:12px">Download PDF</button>
+                </div>
+
+                <div class="sect">Your risk assessment</div>
+                <div id="pr-gest">
+                    <div class="spin">calculating…</div>
+                </div>
+
+                <div class="sect">Your baseline</div>
+                <div id="pr-base"></div>
+
+                <div class="sect">Settings</div>
+                <div class="card">
+                    <div class="row">
+                        <div class="icon">👤</div>
+                        <div style="flex:1">
+                            <div class="ttl" id="pr-name">—</div>
+                            <div class="sm" id="pr-phone">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn ghost" onclick="location.reload()" style="margin-top:10px">Sign out</button>
+
+                <div class="footnote">
+                    Pulse and oxygen come from an uncalibrated MAX30100 worn at home. Temperature and
+                    humidity are ambient air from a DHT11, not body measurements. Nothing here is a diagnosis.
+                </div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+    </div>
+
+    <script>
+        /* ═══════════════ state ═══════════════ */
+        const API = '';
+        const S = {
+            user: { name: 'Priya', phone: '' },
+            flags: { primi: true },
+            subject: 's01',
+            weeks: 28, days: 3,
+            sessions: [], baseline: null, status: null,
+            symptoms: new Set(),
+            taps: [], ctStart: null, ctTimer: null,
+            charts: {}
+        };
+        const $ = id => document.getElementById(id);
+        const fmt = (v, d = 1) => (v === null || v === undefined || isNaN(v)) ? '—' : Number(v).toFixed(d);
+
+        /* ═══════════════ nav / router ═══════════════ */
+        const NAV = [
+            { id: 's-home', i: '◉', t: 'Today' },
+            { id: 's-log', i: '＋', t: 'Log' },
+            { id: 's-watch', i: '◈', t: 'Watch' },
+            { id: 's-heat', i: '☀', t: 'Heat' },
+            { id: 's-trends', i: '◔', t: 'Trends' },
+        ];
+        function paintNav(active) {
+            document.querySelectorAll('.nav').forEach(n => {
+                n.innerHTML = NAV.map(x =>
+                    `<a class="${x.id === active ? 'on' : ''}" onclick="go('${x.id}')">
+         <span class="i">${x.i}</span><span class="t">${x.t}</span></a>`).join('');
+            });
+        }
+        let current = 's-splash';
+        function go(id, back) {
+            const from = $(current), to = $(id);
+            if (from) { from.classList.remove('on', 'back'); }
+            to.classList.toggle('back', !!back);
+            to.classList.add('on');
+            current = id;
+            const b = to.querySelector('.body'); if (b) b.scrollTop = 0;
+            paintNav(id);
+            if (id === 's-home') refreshHome();
+            if (id === 's-heat') loadHeat();
+            if (id === 's-watch') loadWatch();
+            if (id === 's-trends') loadTrends();
+            if (id === 's-profile') loadProfile();
+        }
+
+        /* ═══════════════ toggles ═══════════════ */
+        function tog(el, key) {
+            el.classList.toggle('on');
+            const on = el.classList.contains('on');
+            if (key.startsWith('ack')) {
+                S.flags[key] = on;
+                $('btn-terms').disabled = !(S.flags.ack1 && S.flags.ack2 && S.flags.ack3);
+            } else if (key.startsWith('sym:')) {
+                const s = key.slice(4);
+                on ? S.symptoms.add(s) : S.symptoms.delete(s);
+            } else {
+                S.flags[key] = on;
+            }
+        }
+
+        /* ═══════════════ splash ═══════════════ */
+        let splashDone = false;
+        function endSplash() {
+            if (splashDone) return;
+            splashDone = true;
+            const v = $('logo-vid');
+            if (v) { try { v.pause(); } catch (e) { } }
+            go('s-terms');
+        }
+        (function () {
+            const v = $('logo-vid');
+            setTimeout(() => { const s = $('skip'); if (s) s.classList.add('show'); }, 2200);
+            const safety = setTimeout(endSplash, 12000);            // never hang
+            if (!v) { clearTimeout(safety); setTimeout(endSplash, 2000); return; }
+            v.addEventListener('ended', () => { clearTimeout(safety); endSplash(); });
+            v.addEventListener('error', () => { clearTimeout(safety); endSplash(); });
+            v.play().catch(() => { });   // autoplay may be blocked; tap-to-skip still works
+        })();
+
+        /* ═══════════════ login ═══════════════ */
+        function login() {
+            S.user.name = $('in-name').value.trim() || 'there';
+            S.user.phone = $('in-phone').value.trim();
+            go('s-onboard');
+        }
+
+        /* ═══════════════ onboarding ═══════════════ */
+        let obStep = 1;
+        const OB_TITLES = ['About you', 'Your pregnancy', 'Risk factors'];
+        function bmi() {
+            const w = +$('p-wt').value, h = +$('p-ht').value / 100;
+            const v = (w && h) ? w / (h * h) : 0;
+            $('p-bmi').value = v ? v.toFixed(1) : '';
+            return v;
+        }
+        ['p-wt', 'p-ht'].forEach(id => $(id).addEventListener('input', bmi));
+        bmi();
+
+        function obPaint() {
+            document.querySelectorAll('.ob').forEach(e =>
+                e.style.display = (+e.dataset.step === obStep) ? '' : 'none');
+            $('ob-title').textContent = OB_TITLES[obStep - 1];
+            $('ob-step').textContent = `STEP ${obStep} OF 3`;
+            document.querySelectorAll('#s-onboard .dots i').forEach((d, i) =>
+                d.classList.toggle('on', i === obStep - 1));
+            $('ob-next').textContent = obStep === 3 ? 'Finish setup' : 'Continue';
+        }
+        function obNext() {
+            if (obStep < 3) { obStep++; obPaint(); return; }
+            S.weeks = +$('p-wk').value; S.days = +$('p-dy').value;
+            go('s-home');
+        }
+        function obBack() {
+            if (obStep > 1) { obStep--; obPaint(); } else go('s-login', 1);
+        }
+
+        /* ═══════════════ api ═══════════════ */
+        async function get(p) { const r = await fetch(API + p); if (!r.ok) throw new Error(r.status); return r.json(); }
+        async function post(p, b) {
+            const r = await fetch(API + p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) });
+            if (!r.ok) throw new Error(r.status); return r.json();
+        }
+
+        /* ═══════════════ alert card ═══════════════ */
+        const TIER = ['Log', 'Self-care', 'Confirm it', 'Call your provider'];
+        function cardHTML(c) {
+            return `<div class="alert a${c.tier}">
+    <span class="chip t${c.tier}">${TIER[c.tier]}</span>
+    <h3>${c.title}</h3><p>${c.detail}</p>
+    ${c.evidence && c.evidence.length ? '<ul>' + c.evidence.map(e => `<li>${e}</li>`).join('') + '</ul>' : ''}
+    ${c.action ? `<div class="act"><button class="btn sm">${c.action}</button></div>` : ''}
+  </div>`;
+        }
+
+        /* ═══════════════ home ═══════════════ */
+        async function refreshHome() {
+            const h = new Date().getHours();
+            $('hi').textContent = `Good ${h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening'}, ${S.user.name}`;
+            $('wk-label').textContent = `WEEK ${S.weeks} · DAY ${S.days} · ${S.weeks < 28 ? 'SECOND' : 'THIRD'} TRIMESTER`;
+
+            const todo = [];
+            if (!S.vitalsDone) todo.push({ i: '🩺', bg: 'var(--amber-soft)', t: 'Blood pressure', s: 'Due today · takes 2 min', c: 't2', a: "go('s-vitals')" });
+            if (!S.symDone) todo.push({ i: '📋', bg: 'var(--violet-soft)', t: 'How you feel', s: 'Quick checklist', c: 't0', a: "go('s-symptoms')" });
+            if (!S.readDone) todo.push({ i: '💜', bg: 'var(--violet-soft)', t: 'Belt reading', s: '5 quiet minutes', c: 't0', a: "go('s-reading')" });
+            $('todo').innerHTML = todo.length
+                ? todo.map(x => `<div class="card" onclick="${x.a}" style="cursor:pointer">
+        <div class="row"><div class="icon" style="background:${x.bg}">${x.i}</div>
+        <div style="flex:1"><div class="ttl">${x.t}</div><div class="sm">${x.s}</div></div>
+        <span class="chip ${x.c}">Log</span></div></div>`).join('')
+                : '<div class="card"><div class="sm">All of today\'s checks are done.</div></div>';
+            $('home-h').textContent = todo.length ? `${todo.length} check${todo.length > 1 ? 's' : ''} left` : 'Today is done';
+
+            try {
+                const st = await get(`/api/status/${S.subject}?posture=sitting`);
+                S.status = st;
+                if (st.ready && st.latest) {
+                    const ago = Math.round((Date.now() - new Date(st.latest.ts)) / 3600000);
+                    $('fresh').textContent = `LAST BELT READING ${ago < 1 ? 'JUST NOW' : ago + 'H AGO'} · ${st.latest.pct_usable}% CLEAN`;
+                }
+                const cards = (st.cards || []).filter(c => c.tier > 0);
+                $('home-alerts').innerHTML = cards.length ? cards.map(cardHTML).join('')
+                    : `<div class="card"><div class="sm">Nothing crossed a threshold today.</div></div>`;
+            } catch (e) {
+                $('home-alerts').innerHTML = `<div class="card"><div class="sm">Can't reach the belt service right now. Your logs are still saved.</div></div>`;
+            }
+        }
+
+        /* ═══════════════ belt reading (live sim from last session) ═══════════════ */
+        let simT = null;
+        async function simulate() {
+            clearInterval(simT);
+            $('rd-sub').textContent = 'READING…';
+            let rows = [];
+            try {
+                const sess = S.sessions.length ? S.sessions : await get(`/api/sessions/${S.subject}`);
+                S.sessions = sess;
+                const rest = sess.filter(s => (s.context || '').includes('rest'));
+                if (rest.length) rows = await get(`/api/session/${rest[rest.length - 1].session_id}`);
+            } catch (e) { }
+            if (!rows.length) { $('rd-sub').textContent = 'NO SENSOR DATA'; return; }
+
+            let i = 0;
+            const wave = $('rd-wave');
+            wave.innerHTML = Array.from({ length: 26 }, () => '<i style="height:20%"></i>').join('');
+            const bars = wave.querySelectorAll('i');
+
+            simT = setInterval(() => {
+                const r = rows[i % rows.length]; i++;
+                $('rd-hr').innerHTML = r.heart_rate_bpm ? `${fmt(r.heart_rate_bpm, 0)}<small>bpm</small>`
+                    : `—<small>bpm</small>`;
+                $('rd-spo2').innerHTML = r.spo2_pct ? `${fmt(r.spo2_pct, 0)}<small>%</small>` : `—<small>%</small>`;
+                $('rd-temp').innerHTML = r.temperature_c ? `${fmt(r.temperature_c, 1)}<small>°C</small>` : `—<small>°C</small>`;
+                $('rd-hum').textContent = r.humidity_pct ? `Humidity ${fmt(r.humidity_pct, 0)}%` : '—';
+
+                const q = r.signal_quality || 0;
+                $('rd-qual').querySelectorAll('i').forEach((b, n) => b.classList.toggle('on', q * 5 > n));
+                $('rd-sub').textContent = q >= .5 ? 'GOOD SIGNAL' : q >= .3 ? 'ADJUST YOUR FINGER' : 'POOR CONTACT';
+
+                bars.forEach((b, n) => {
+                    const p = (i + n) % 10;
+                    const amp = q > .3 ? 1 : .25;
+                    const h = 18 + [4, 42, 90, 48, 22, 16, 54, 96, 44, 20][p] * amp * .8;
+                    b.style.height = Math.min(h, 100) + '%';
+                });
+                if (i > 90) { clearInterval(simT); $('rd-sub').textContent = 'READING COMPLETE'; S.readDone = true; }
+            }, 170);
+        }
+
+        /* ═══════════════ symptoms ═══════════════ */
+        const SYMS = [
+            ['headache', 'Bad headache that will not go'],
+            ['vision', 'Blurred vision, flashes or spots'],
+            ['epigastric', 'Pain under the ribs on the right'],
+            ['swelling', 'Sudden swelling of face or hands'],
+            ['reduced_urine', 'Passing much less urine'],
+            ['tiredness', 'Unusually tired'],
+            ['breathlessness', 'Breathless on stairs'],
+            ['dizziness', 'Dizzy or light-headed'],
+        ];
+        $('sym-list').innerHTML = SYMS.map(([k, l]) =>
+            `<div class="tog" onclick="tog(this,'sym:${k}')"><div class="box">✓</div><span>${l}</span></div>`).join('');
+
+        async function runAssess() {
+            const num = id => (!$(id) || $(id).value === '') ? null : +$(id).value;
+            const body = {
+                temp_c: num('m-temp'), sbp: num('m-sbp'), dbp: num('m-dbp'),
+                weight_gain_kg: num('m-wt'), prior_hb: num('m-hb'),
+                ifa_missed_days: num('m-ifa') || 0,
+                symptoms: [...S.symptoms], fluid_leak: !!S.leak
+            };
+            const target = current === 's-symptoms' ? 'sym-out' : 'v-out';
+            $(target).innerHTML = '<div class="spin">checking…</div>';
+            try {
+                const r = await post(`/api/assess/${S.subject}?gestational_weeks=${S.weeks}`, body);
+                $(target).innerHTML = r.cards.length ? r.cards.map(cardHTML).join('')
+                    : `<div class="card"><div class="sm">Nothing entered crossed a threshold. That is not an all-clear.</div></div>`;
+                if (current === 's-vitals') S.vitalsDone = true; else S.symDone = true;
+            } catch (e) { $(target).innerHTML = `<div class="err">Could not reach the service.</div>`; }
+        }
+        function leak() { S.leak = true; go('s-vitals'); setTimeout(runAssess, 150); }
+
+        /* ═══════════════ contractions ═══════════════ */
+        function ctTap() {
+            const now = Date.now();
+            S.taps.push(now);
+            if (!S.ctStart) {
+                S.ctStart = now;
+                S.ctTimer = setInterval(() => {
+                    const s = Math.floor((Date.now() - S.ctStart) / 1000);
+                    $('ct-time').textContent =
+                        `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+                }, 500);
+            }
+            const gaps = S.taps.slice(1).map((t, i) => ((t - S.taps[i]) / 60000));
+            $('ct-label').textContent = `${S.taps.length} contraction${S.taps.length > 1 ? 's' : ''} recorded`;
+            $('ct-taps').innerHTML = gaps.map(g => `<b>${g.toFixed(1)} min</b>`).join('');
+        }
+        function ctReset() {
+            clearInterval(S.ctTimer); S.taps = []; S.ctStart = null;
+            $('ct-time').textContent = '00:00'; $('ct-label').textContent = 'Not started';
+            $('ct-taps').innerHTML = ''; $('ct-out').innerHTML = '';
+        }
+        async function ctCheck() {
+            const gaps = S.taps.slice(1).map((t, i) => ((t - S.taps[i]) / 60000));
+            if (gaps.length < 2) {
+                $('ct-out').innerHTML =
+                '<div class="card"><div class="sm">Record at least three contractions so there is a pattern to read.</div></div>'; return;
+            }
+            const hrs = (Date.now() - S.ctStart) / 3600000;
+            try {
+                const r = await post('/api/contractions', {
+                    gestational_weeks: S.weeks, intervals_min: gaps, duration_sec: 55, hours_ongoing: hrs
+                });
+                $('ct-out').innerHTML = cardHTML(r);
+            } catch (e) { $('ct-out').innerHTML = `<div class="err">Could not reach the service.</div>`; }
+        }
+
+
+        /* ═══════════════ watch (combined signals) ═══════════════ */
+        async function loadWatch() {
+            const has = {
+                pulse: false, baseline: false, belt: false, weather: false,
+                bp: false, temp: false, sym: S.symptoms.size > 0, hb: false,
+                weight: false, leak: !!S.leak, taps: S.taps.length > 1
+            };
+            let st = null, ht = null;
+            try {
+                st = await get(`/api/status/${S.subject}?posture=sitting`);
+                has.pulse = !!(st.ready && st.latest);
+                has.baseline = !!(st.deviation && st.deviation.ready);
+            } catch (e) { }
+            try {
+                ht = await get('/api/heat');
+                has.belt = !!(ht && ht.belt); has.weather = !!(ht && ht.outdoor);
+            } catch (e) { }
+            const num = id => (!$(id) || $(id).value === '') ? null : +$(id).value;
+            has.bp = num('m-sbp') !== null; has.temp = num('m-temp') !== null;
+            has.hb = num('m-hb') !== null; has.weight = num('m-wt') !== null;
+
+            const dev = (st && st.deviation && st.deviation.ready) ? st.deviation : null;
+            const lvl = dev ? dev.level : null;
+            const raised = lvl === 'moderate' || lvl === 'marked';
+
+            const MODULES = [
+                {
+                    n: 'Fever and infection', ic: '🌡',
+                    feeds: [['Resting pulse', has.baseline], ['Your baseline', has.baseline],
+                    ['Thermometer', has.temp], ['Symptoms', has.sym]],
+                    tier: has.temp && num('m-temp') >= 38 ? 3 : raised ? 2 : 0,
+                    say: has.temp && num('m-temp') >= 38
+                        ? 'Measured temperature is 38 C or above with a raised pulse. That combination needs a clinician today.'
+                        : raised ? `Pulse is ${dev.delta > 0 ? '+' : ''}${dev.delta} bpm against your usual. Confirm with a thermometer before anyone reacts.`
+                            : 'Pulse sits in your usual range. The belt cannot measure body temperature, so a thermometer is always the confirming step.'
+                },
+
+                {
+                    n: 'Low haemoglobin', ic: '🩸',
+                    feeds: [['Resting pulse', has.baseline], ['Tiredness', S.symptoms.has('tiredness')],
+                    ['Breathlessness', S.symptoms.has('breathlessness')], ['Last Hb', has.hb], ['Iron adherence', true]],
+                    tier: (raised && S.symptoms.size >= 2) || (has.hb && num('m-hb') < 11) ? 2 : 0,
+                    say: 'Anaemia makes the heart beat faster to move the same oxygen. A raised resting pulse with tiredness or breathlessness is a reason to ask for a blood test, not a diagnosis.'
+                },
+
+                {
+                    n: 'Heat strain', ic: '☀',
+                    feeds: [['Under-belt air', has.belt], ['Belt humidity', has.belt],
+                    ['Local weather', has.weather], ['4-day forecast', has.weather]],
+                    tier: ht && ht.guidance ? ht.guidance.tier : 0,
+                    say: ht && ht.guidance ? ht.guidance.detail
+                        : 'Combines the trapped air under your clothing with outdoor conditions, then looks four days ahead.'
+                },
+
+                {
+                    n: 'Pre-eclampsia', ic: '🩺',
+                    feeds: [['Blood pressure', has.bp], ['Weekly weight', has.weight],
+                    ['Red-flag symptoms', has.sym], ['Gestosis score', true]],
+                    tier: (has.bp && (num('m-sbp') >= 140 || num('m-dbp') >= 90)) ? 3
+                        : (S.symptoms.has('headache') || S.symptoms.has('vision') || S.symptoms.has('swelling')) ? 2 : 0,
+                    say: 'Blood pressure is the single most important number in pregnancy and no wearable can measure it. Log it from your cuff and the rules do the rest.'
+                },
+
+                {
+                    n: 'Waters breaking', ic: '💦',
+                    feeds: [['Your report', has.leak], ['Temperature', has.temp], ['Pulse trend', has.baseline]],
+                    tier: has.leak ? 3 : 0,
+                    say: has.leak
+                        ? 'Any suspected leak needs examining the same day. With a raised temperature or pulse it becomes urgent.'
+                        : 'A single button. Leaking fluid plus fever or a raised pulse is the pattern for infection in the waters.'
+                },
+
+                {
+                    n: 'Early labour', ic: '⏱',
+                    feeds: [['Contraction timer', has.taps], [`Week ${S.weeks}`, true]],
+                    tier: has.taps && S.weeks < 37 ? 2 : 0,
+                    say: S.weeks < 37
+                        ? `At ${S.weeks} weeks the 5-1-1 rule does not apply. Any regular pattern is checked straight away.`
+                        : `At ${S.weeks} weeks the 5-1-1 rule applies: five minutes apart, one minute long, for one hour.`
+                }
+            ];
+
+            $('w-list').innerHTML = MODULES.map(m => {
+                const live = m.feeds.filter(f => f[1]).length;
+                return `<div class="wrow ${m.tier >= 3 ? 'on3' : m.tier === 2 ? 'on2' : ''}">
+      <div class="hd"><div class="icon" style="width:34px;height:34px;font-size:16px">${m.ic}</div>
+        <div class="nm">${m.n}</div>
+        <span class="chip t${m.tier}">${TIER[m.tier]}</span></div>
+      <div class="feeds">${m.feeds.map(f =>
+                    `<span class="feed ${f[1] ? 'live' : 'miss'}">${f[0]}</span>`).join('')}</div>
+      <div class="meter"><i style="width:${Math.round(100 * live / m.feeds.length)}%"></i></div>
+      <div class="say">${m.say}</div></div>`;
+            }).join('');
+
+            const ready = MODULES.filter(m => m.feeds.every(f => f[1])).length;
+            $('w-sub').textContent = `${ready} OF ${MODULES.length} FULLY FED`;
+
+            // trained classifier, scored on a real session
+            try {
+                const sess = S.sessions.length ? S.sessions : await get(`/api/sessions/${S.subject}`);
+                S.sessions = sess;
+                if (!sess.length) throw 0;
+                const q = await get(`/api/quality/${sess[sess.length - 1].session_id}`);
+                $('w-ml').innerHTML = `<div class="card">
+      <div class="hd" style="display:flex;align-items:center;gap:11px">
+        <div class="icon" style="width:34px;height:34px;font-size:16px">◈</div>
+        <div style="flex:1"><div class="ttl">Gradient-boosted classifier</div>
+          <div class="sm">Decides which windows are trustworthy</div></div></div>
+      <div class="two" style="margin-top:13px">
+        <div class="stat"><div class="k">Confidence</div>
+          <div class="v">${fmt(q.mean_confidence * 100, 0)}<small>%</small></div></div>
+        <div class="stat"><div class="k">Agreement</div>
+          <div class="v">${fmt(q.agreement * 100, 0)}<small>%</small></div></div></div>
+      <div class="sm" style="margin-top:10px">Predicted ${q.predicted_usable} usable of ${q.n};
+        the pipeline actually produced ${q.actual_usable}. Scored on
+        <b>${q.session_id}</b>.</div></div>`;
+            } catch (e) {
+                $('w-ml').innerHTML = `<div class="card"><div class="sm">Quality model not reachable —
+      add the <b>/api/quality</b> route to api.py and restart.</div></div>`;
+            }
+        }
+
+        /* ═══════════════ heat ═══════════════ */
+        async function loadHeat() {
+            try {
+                const h = await get('/api/heat');
+                if (h.error) { $('ht-body').innerHTML = `<div class="card"><div class="sm">${h.error}</div></div>`; return; }
+                $('ht-place').textContent = (h.place || '').toUpperCase();
+                const feels = h.belt ? h.belt.feels_c : (h.outdoor ? h.outdoor.feels_c : 0);
+                const pos = Math.max(4, Math.min(96, (feels - 24) / 22 * 100));
+
+                let out = `<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="sm">Feels like</div>
+          <div class="num" style="font-size:40px;letter-spacing:-.03em;margin-top:2px">${fmt(feels, 0)}<span style="font-size:17px;color:var(--muted)">°C</span></div></div>
+        ${h.guidance ? `<span class="chip t${h.guidance.tier}">${TIER[h.guidance.tier]}</span>` : ''}
+      </div>
+      <div class="gauge"><i style="left:${pos}%"></i></div>
+      <div class="scale"><span>SAFE</span><span>CARE</span><span>AVOID</span></div>
+    </div>
+    <div class="two" style="margin-top:10px">`;
+                if (h.outdoor) out += `<div class="stat"><div class="k">Outdoor</div>
+      <div class="v">${fmt(h.outdoor.temp_c, 1)}<small>°C</small></div>
+      <div class="sm" style="font-size:11px">${fmt(h.outdoor.humidity, 0)}% humidity</div></div>`;
+                if (h.belt) out += `<div class="stat"><div class="k">Under your belt</div>
+      <div class="v">${fmt(h.belt.temp_c, 1)}<small>°C</small></div>
+      <div class="sm" style="font-size:11px">${fmt(h.belt.humidity, 0)}% humidity</div></div>`;
+                out += `</div>`;
+                if (h.guidance) out += `<div style="margin-top:10px">${cardHTML(h.guidance)}</div>`;
+                if (h.ahead && h.ahead.length) {
+                    out += `<div class="sect">Days ahead</div><div class="fore">` +
+                        h.ahead.map(d => `<div class="day hot"><div class="d">${d.day.slice(0, 3).toUpperCase()}</div>
+          <div class="t">${fmt(d.feels_max_c, 0)}°</div></div>`).join('') + `</div>`;
+                }
+                out += `<div class="footnote">The belt measures the air trapped under your clothing — often
+      several degrees warmer than the weather report. That trapped air is what your body
+      actually has to lose heat into.</div>`;
+                $('ht-body').innerHTML = out;
+            } catch (e) { $('ht-body').innerHTML = `<div class="card"><div class="sm">Weather service unreachable.</div></div>`; }
+        }
+
+        /* ═══════════════ trends ═══════════════ */
+        async function loadTrends() {
+            try {
+                const [sess, base] = await Promise.all([
+                    get(`/api/sessions/${S.subject}`),
+                    get(`/api/baseline/${S.subject}?posture=sitting`)
+                ]);
+                S.sessions = sess; S.baseline = base;
+
+                $('tr-top').innerHTML = base.ready
+                    ? `<div class="two">
+          <div class="stat"><div class="k">Your resting pulse</div>
+            <div class="v">${fmt(base.hr_mean, 0)}<small>bpm</small></div>
+            <div class="sm" style="font-size:11px">${base.n_sessions} sessions</div></div>
+          <div class="stat"><div class="k">Normal spread</div>
+            <div class="v">±${fmt(base.hr_sd, 1)}<small>bpm</small></div>
+            <div class="sm" style="font-size:11px">sitting</div></div></div>`
+                    : `<div class="card"><div class="ttl">Baseline not ready</div>
+         <div class="sm" style="margin-top:6px">Garbha Sethu needs at least two clean resting readings
+         before it will publish a baseline. It will not guess from one.</div></div>`;
+
+                const withHr = sess.filter(s => s.hr_mean);
+                if (S.charts.trend) S.charts.trend.destroy();
+                S.charts.trend = new Chart($('c-trend'), {
+                    type: 'line',
+                    data: {
+                        labels: withHr.map((s, i) => '#' + (i + 1)),
+                        datasets: [
+                            {
+                                label: 'resting', data: withHr.map(s => (s.context || '').includes('rest') ? s.hr_mean : null),
+                                borderColor: '#7C5CD6', backgroundColor: 'rgba(124,92,214,.13)', borderWidth: 2.2,
+                                tension: .35, spanGaps: true, pointRadius: 4, fill: true
+                            },
+                            {
+                                label: 'after activity', data: withHr.map(s => (s.context || '').includes('exertion') ? s.hr_mean : null),
+                                borderColor: '#B87516', borderWidth: 2, tension: .35, spanGaps: true,
+                                pointRadius: 4, borderDash: [5, 4]
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { labels: { font: { size: 10 }, boxWidth: 11 } } },
+                        scales: {
+                            y: { grid: { color: '#EFECF6' }, ticks: { font: { size: 9 } } },
+                            x: { grid: { display: false }, ticks: { font: { size: 9 } } }
+                        }
+                    }
+                });
+
+                const rest = sess.filter(s => (s.context || '').includes('rest'));
+                if (rest.length) {
+                    const sid = rest[rest.length - 1].session_id;
+                    $('tr-name').textContent = '· ' + sid;
+                    const rows = await get(`/api/session/${sid}`);
+                    if (S.charts.detail) S.charts.detail.destroy();
+                    S.charts.detail = new Chart($('c-detail'), {
+                        type: 'line',
+                        data: {
+                            labels: rows.map(r => r.t),
+                            datasets: [
+                                {
+                                    label: 'pulse', yAxisID: 'y', data: rows.map(r => r.heart_rate_bpm),
+                                    borderColor: '#7C5CD6', borderWidth: 1.5, pointRadius: 0, tension: .25, spanGaps: false
+                                },
+                                {
+                                    label: 'quality', yAxisID: 'y1', data: rows.map(r => r.signal_quality),
+                                    borderColor: '#238C7E', borderWidth: 1.1, pointRadius: 0, tension: .25, borderDash: [3, 3]
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: { legend: { labels: { font: { size: 10 }, boxWidth: 11 } } },
+                            scales: {
+                                y: { position: 'left', grid: { color: '#EFECF6' }, ticks: { font: { size: 9 } } },
+                                y1: { position: 'right', min: 0, max: 1, grid: { display: false }, ticks: { font: { size: 9 } } },
+                                x: { grid: { display: false }, ticks: { font: { size: 8 }, maxTicksLimit: 8 } }
+                            }
+                        }
+                    });
+                }
+            } catch (e) { $('tr-top').innerHTML = `<div class="err">Could not load your readings.</div>`; }
+        }
+
+        /* ═══════════════ profile ═══════════════ */
+        async function loadProfile() {
+            $('pr-name').textContent = S.user.name;
+            $('pr-phone').textContent = S.user.phone || 'no number saved';
+            $('pr-sub').textContent = `WEEK ${S.weeks} · DAY ${S.days}`;
+            try {
+                const g = await post('/api/gestosis', {
+                    age: +$('p-age').value, bmi: +$('p-bmi').value || 24, map_mmhg:
+                        (+$('p-sbp').value + 2 * +$('p-dbp').value) / 3 || 82,
+                    gestational_weeks: S.weeks,
+                    primigravida: !!S.flags.primi, art: !!S.flags.art, prior_pe: !!S.flags.prior_pe,
+                    chronic_htn: !!S.flags.chronic_htn, diabetes: !!S.flags.diabetes,
+                    multiple: !!S.flags.multiple, family_pe: !!S.flags.family_pe
+                });
+                $('pr-gest').innerHTML =
+                    `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div class="sm">FOGSI gestosis score</div>
+          <div class="num" style="font-size:32px;margin-top:3px">${g.score}<span style="font-size:14px;color:var(--muted)"> pts</span></div></div>
+        <span class="chip t${g.result.tier}">${g.high_risk ? 'High risk' : 'Standard'}</span></div></div>` +
+                    cardHTML(g.result);
+            } catch (e) { $('pr-gest').innerHTML = `<div class="err">Could not calculate.</div>`; }
+
+            try {
+                const b = await get(`/api/baseline/${S.subject}?posture=sitting`);
+                $('pr-base').innerHTML = b.ready
+                    ? `<div class="card"><div class="ttl">${fmt(b.hr_mean, 0)} bpm resting</div>
+         <div class="sm" style="margin-top:5px">Built from ${b.n_sessions} clean sessions,
+         spread ±${fmt(b.hr_sd, 1)} bpm. Alerts compare against this, not a population average.</div></div>`
+                    : `<div class="card"><div class="sm">Not enough clean readings yet.</div></div>`;
+            } catch (e) { $('pr-base').innerHTML = ''; }
+        }
+        function downloadReport() { window.open(`/api/report/${S.subject}`, '_blank'); }
+
+        paintNav('s-home');
+    </script>
+</body>
+
+</html>
