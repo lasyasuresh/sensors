@@ -2249,7 +2249,7 @@
             $('lv-out').innerHTML = '';
             $('lv-sub').textContent = 'STARTING';
             try {
-                const r = await post((PI || '') + '/api/live/start',
+                const r = await post('/api/live/start',
                     { subject_id: S.subject, posture: 'sitting', seconds: 60 });
                 if (!r.ok) {
                     $('lv-out').innerHTML = `<div class="err">${r.reason}</div>`;
@@ -2266,7 +2266,7 @@
             clearInterval(livePoll);
             livePoll = setInterval(async () => {
                 let st;
-                try { st = await get((PI || '') + '/api/live/state'); }
+                try { st = await get('/api/live/state'); }
                 catch (e) {
                     $('lv-msg').textContent = 'Lost connection to the belt.';
                     return;
@@ -2314,7 +2314,7 @@
 
         async function stopLive() {
             clearInterval(livePoll);
-            try { await post((PI || '') + '/api/live/cancel', {}); } catch (e) { }
+            try { await post('/api/live/cancel', {}); } catch (e) { }
             $('lv-sub').textContent = 'STOPPED';
             $('lv-msg').textContent = 'Reading stopped.';
             $('lv-stop').textContent = 'Start again';
