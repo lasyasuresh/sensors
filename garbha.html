@@ -1279,32 +1279,37 @@
             <div class="body pad">
                 <div class="tiles">
                     <div class="tile" onclick="go('s-contract')">
-                        <div class="icon" style="background:var(--coral-soft)">⏱</div><b>Contractions</b><em>Start
-                            timer</em>
+                        <div class="icon" style="background:var(--coral-soft)">⏱</div><b>Contractions</b><em>Timer</em>
                     </div>
-                    <div class="tile" onclick="leak()">
+                    <div class="tile" onclick="go('s-leak')">
                         <div class="icon" style="background:var(--coral-soft)">💦</div><b>Fluid leak</b><em>Any
                             amount</em>
                     </div>
-                    <div class="tile" onclick="go('s-vitals')">
+                    <div class="tile" onclick="go('s-bp')">
                         <div class="icon" style="background:var(--amber-soft)">🩺</div><b>Blood pressure</b><em>From
                             your cuff</em>
                     </div>
-                    <div class="tile" onclick="go('s-vitals')">
-                        <div class="icon" style="background:var(--amber-soft)">🌡</div><b>Temperature</b><em>From
-                            thermometer</em>
+                    <div class="tile" onclick="go('s-temp')">
+                        <div class="icon" style="background:var(--amber-soft)">🌡</div>
+                        <b>Temperature</b><em>Thermometer</em>
                     </div>
                     <div class="tile" onclick="go('s-symptoms')">
-                        <div class="icon">📋</div><b>How you feel</b><em>Quick checklist</em>
+                        <div class="icon">📋</div><b>How you feel</b><em>Checklist</em>
                     </div>
                     <div class="tile" onclick="go('s-reading')">
                         <div class="icon">💜</div><b>Belt reading</b><em>5 minutes</em>
                     </div>
-                    <div class="tile" onclick="go('s-vitals')">
+                    <div class="tile" onclick="go('s-weight')">
                         <div class="icon">⚖️</div><b>Weight</b><em>Weekly</em>
                     </div>
-                    <div class="tile" onclick="go('s-vitals')">
-                        <div class="icon">💊</div><b>Iron tablet</b><em>Taken today?</em>
+                    <div class="tile" onclick="go('s-iron')">
+                        <div class="icon">💊</div><b>Iron tablet</b><em>Today</em>
+                    </div>
+                    <div class="tile" onclick="go('s-hb')">
+                        <div class="icon">🧾</div><b>Lab result</b><em>Hb from report</em>
+                    </div>
+                    <div class="tile" onclick="go('s-history')">
+                        <div class="icon">🗂</div><b>Everything logged</b><em>Your history</em>
                     </div>
                 </div>
             </div>
@@ -1345,40 +1350,163 @@
                         pressing hard squeezes the blood out. Cover both lights. Sit still and breathe normally.</div>
                 </div>
                 <button class="btn soft" onclick="simulate()" style="margin-top:12px">Start reading</button>
+                <div class="sect">Against your baseline</div>
+                <div id="rd-base">
+                    <div class="spin">loading…</div>
+                </div>
+                <div class="footnote">Only windows the quality model trusts are kept. If your finger
+                    shifts, Garbha Sethu records a gap rather than a guess — which is why a five minute
+                    reading rarely yields five minutes of data.</div>
             </div>
             <nav class="nav"></nav>
         </section>
 
-        <!-- ══════════════════ VITALS ENTRY ══════════════════ -->
-        <section class="screen" id="s-vitals">
+        <!-- ══════════════════ BLOOD PRESSURE ══════════════════ -->
+        <section class="screen" id="s-bp">
             <div class="top">
                 <div class="back" onclick="go('s-log',1)">←</div>
                 <div>
-                    <h1>From your instruments</h1>
-                    <div class="sub">MEASURED VALUES ONLY</div>
+                    <h1>Blood pressure</h1>
+                    <div class="sub">FROM YOUR CUFF</div>
                 </div>
             </div>
             <div class="body pad">
+                <p class="lede" style="margin-bottom:18px">Sit quietly for five minutes first, arm at heart height.
+                    This is the most important number in pregnancy and no wearable can measure it.</p>
                 <div class="two">
-                    <div class="field"><label class="f">Temperature °C</label><input type="number" step="0.1"
-                            id="m-temp" placeholder="37.0"></div>
-                    <div class="field"><label class="f">Weight gain kg/wk</label><input type="number" step="0.1"
-                            id="m-wt" placeholder="0.4"></div>
+                    <div class="field"><label class="f">Systolic (top)</label>
+                        <input type="number" id="l-sbp" inputmode="numeric" placeholder="118">
+                    </div>
+                    <div class="field"><label class="f">Diastolic (bottom)</label>
+                        <input type="number" id="l-dbp" inputmode="numeric" placeholder="76">
+                    </div>
                 </div>
-                <div class="two" style="margin-top:12px">
-                    <div class="field"><label class="f">Systolic</label><input type="number" id="m-sbp"
-                            placeholder="120"></div>
-                    <div class="field"><label class="f">Diastolic</label><input type="number" id="m-dbp"
-                            placeholder="78"></div>
+                <button onclick="saveLog('bp')" style="margin-top:18px">Save reading</button>
+                <div id="o-bp" style="margin-top:14px"></div>
+                <div id="h-bp"></div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ TEMPERATURE ══════════════════ -->
+        <section class="screen" id="s-temp">
+            <div class="top">
+                <div class="back" onclick="go('s-log',1)">←</div>
+                <div>
+                    <h1>Temperature</h1>
+                    <div class="sub">FROM A THERMOMETER</div>
                 </div>
-                <div class="two" style="margin-top:12px">
-                    <div class="field"><label class="f">Last Hb g/dL</label><input type="number" step="0.1" id="m-hb"
-                            placeholder="11.5"></div>
-                    <div class="field"><label class="f">Iron missed (days)</label><input type="number" id="m-ifa"
-                            value="0"></div>
+            </div>
+            <div class="body pad">
+                <p class="lede" style="margin-bottom:18px">The belt measures the air around you, not your body.
+                    A thermometer under the tongue or arm is the only reading that counts here.</p>
+                <div class="field"><label class="f">Temperature °C</label>
+                    <input type="number" step="0.1" id="l-temp" inputmode="decimal" placeholder="37.0">
                 </div>
-                <button onclick="runAssess()" style="margin-top:18px">Save and check</button>
-                <div id="v-out" style="margin-top:14px"></div>
+                <button onclick="saveLog('temp')" style="margin-top:18px">Save reading</button>
+                <div id="o-temp" style="margin-top:14px"></div>
+                <div id="h-temp"></div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ WEIGHT ══════════════════ -->
+        <section class="screen" id="s-weight">
+            <div class="top">
+                <div class="back" onclick="go('s-log',1)">←</div>
+                <div>
+                    <h1>Weight</h1>
+                    <div class="sub">ONCE A WEEK, SAME TIME</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <p class="lede" style="margin-bottom:18px">Morning, before eating, same scales each time.
+                    A sudden jump usually means fluid rather than fat.</p>
+                <div class="field"><label class="f">Weight in kg</label>
+                    <input type="number" step="0.1" id="l-weight" inputmode="decimal" placeholder="64.0">
+                </div>
+                <button onclick="saveLog('weight')" style="margin-top:18px">Save weight</button>
+                <div id="o-weight" style="margin-top:14px"></div>
+                <div id="h-weight"></div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ IRON ══════════════════ -->
+        <section class="screen" id="s-iron">
+            <div class="top">
+                <div class="back" onclick="go('s-log',1)">←</div>
+                <div>
+                    <h1>Iron tablet</h1>
+                    <div class="sub">IFA · DAILY</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <p class="lede" style="margin-bottom:20px">Iron and folic acid tablets are the main defence
+                    against anaemia in pregnancy. Missing days is common and worth knowing about.</p>
+                <button onclick="saveLog('iron',1)">I took it today</button>
+                <button class="btn ghost" onclick="saveLog('iron',0)" style="margin-top:9px">I missed it today</button>
+                <div id="o-iron" style="margin-top:14px"></div>
+                <div id="h-iron"></div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ HAEMOGLOBIN ══════════════════ -->
+        <section class="screen" id="s-hb">
+            <div class="top">
+                <div class="back" onclick="go('s-log',1)">←</div>
+                <div>
+                    <h1>Lab result</h1>
+                    <div class="sub">HAEMOGLOBIN FROM YOUR REPORT</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <p class="lede" style="margin-bottom:18px">Copy the haemoglobin value from your blood test.
+                    Below 11 g/dL is anaemia in pregnancy.</p>
+                <div class="field"><label class="f">Haemoglobin g/dL</label>
+                    <input type="number" step="0.1" id="l-hb" inputmode="decimal" placeholder="11.5">
+                </div>
+                <button onclick="saveLog('hb')" style="margin-top:18px">Save result</button>
+                <div id="o-hb" style="margin-top:14px"></div>
+                <div id="h-hb"></div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ FLUID LEAK ══════════════════ -->
+        <section class="screen" id="s-leak">
+            <div class="top">
+                <div class="back" onclick="go('s-log',1)">←</div>
+                <div>
+                    <h1>Fluid leak</h1>
+                    <div class="sub">ANY AMOUNT COUNTS</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <p class="lede" style="margin-bottom:20px">It is hard to tell amniotic fluid from urine at home,
+                    and that is fine — only an examination can say. Report it and let someone check.</p>
+                <button onclick="saveLog('leak',1)">I think fluid is leaking</button>
+                <div id="o-leak" style="margin-top:14px"></div>
+                <div class="footnote">If it is a gush, or the fluid is green or bloody, or you also feel
+                    feverish — go to hospital rather than waiting.</div>
+            </div>
+            <nav class="nav"></nav>
+        </section>
+
+        <!-- ══════════════════ HISTORY ══════════════════ -->
+        <section class="screen" id="s-history">
+            <div class="top">
+                <div class="back" onclick="go('s-log',1)">←</div>
+                <div>
+                    <h1>Everything logged</h1>
+                    <div class="sub" id="hs-sub">LAST 28 DAYS</div>
+                </div>
+            </div>
+            <div class="body pad">
+                <div id="hs-list">
+                    <div class="spin">loading…</div>
+                </div>
             </div>
             <nav class="nav"></nav>
         </section>
@@ -1396,8 +1524,8 @@
                 <p class="lede" style="margin-bottom:18px">Some of these are warning signs when they come together. Be
                     honest — over-reporting is fine.</p>
                 <div id="sym-list"></div>
-                <button onclick="runAssess()" style="margin-top:18px">Check these</button>
-                <div id="sym-out" style="margin-top:14px"></div>
+                <button onclick="saveLog('symptoms')" style="margin-top:18px">Save and check</button>
+                <div id="o-symptoms" style="margin-top:14px"></div>
             </div>
             <nav class="nav"></nav>
         </section>
@@ -1419,7 +1547,7 @@
                     </div>
                     <div class="taps" id="ct-taps"></div>
                 </div>
-                <button onclick="ctTap()" style="margin-top:12px">Contraction started</button>
+                <button id="ct-btn" onclick="ctTap()" style="margin-top:12px">Contraction started</button>
                 <button class="btn ghost" onclick="ctCheck()" style="margin-top:8px">Check the pattern</button>
                 <button class="btn ghost" onclick="ctReset()" style="margin-top:8px">Reset</button>
                 <div id="ct-out" style="margin-top:14px"></div>
@@ -1564,7 +1692,8 @@
             weeks: 28, days: 3,
             sessions: [], baseline: null, status: null,
             symptoms: new Set(),
-            taps: [], ctStart: null, ctTimer: null,
+            taps: [], durations: [], ctStart: null, ctTimer: null, ctActive: false, ctLast: 0,
+            cards: [], today: null, logs: [],
             charts: {}
         };
         const $ = id => document.getElementById(id);
@@ -1597,6 +1726,13 @@
             if (id === 's-home') refreshHome();
             if (id === 's-heat') loadHeat();
             if (id === 's-watch') loadWatch();
+            if (id === 's-history') loadHistory();
+            if (id === 's-reading') loadReadBase();
+            if (id === 's-bp') loadKindHistory('bp');
+            if (id === 's-temp') loadKindHistory('temp');
+            if (id === 's-weight') loadKindHistory('weight');
+            if (id === 's-iron') loadKindHistory('iron');
+            if (id === 's-hb') loadKindHistory('hb');
             if (id === 's-trends') loadTrends();
             if (id === 's-profile') loadProfile();
         }
@@ -1694,33 +1830,80 @@
         async function refreshHome() {
             const h = new Date().getHours();
             $('hi').textContent = `Good ${h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening'}, ${S.user.name}`;
-            $('wk-label').textContent = `WEEK ${S.weeks} · DAY ${S.days} · ${S.weeks < 28 ? 'SECOND' : 'THIRD'} TRIMESTER`;
+            $('wk-label').textContent =
+                `WEEK ${S.weeks} · DAY ${S.days} · ${S.weeks < 28 ? 'SECOND' : 'THIRD'} TRIMESTER`;
 
-            const todo = [];
-            if (!S.vitalsDone) todo.push({ i: '🩺', bg: 'var(--amber-soft)', t: 'Blood pressure', s: 'Due today · takes 2 min', c: 't2', a: "go('s-vitals')" });
-            if (!S.symDone) todo.push({ i: '📋', bg: 'var(--violet-soft)', t: 'How you feel', s: 'Quick checklist', c: 't0', a: "go('s-symptoms')" });
-            if (!S.readDone) todo.push({ i: '💜', bg: 'var(--violet-soft)', t: 'Belt reading', s: '5 quiet minutes', c: 't0', a: "go('s-reading')" });
+            let done = {};
+            try {
+                const t = await get(`/api/today/${S.subject}`);
+                S.today = t; done = t.done || {};
+            } catch (e) { }
+
+            const DUE = [
+                { k: 'bp', i: '🩺', bg: 'var(--amber-soft)', t: 'Blood pressure', s: 'Due today · 2 min', go: 's-bp' },
+                { k: 'symptoms', i: '📋', bg: 'var(--violet-soft)', t: 'How you feel', s: 'Quick checklist', go: 's-symptoms' },
+                { k: 'iron', i: '💊', bg: 'var(--violet-soft)', t: 'Iron tablet', s: 'Tick when taken', go: 's-iron' },
+                { k: 'reading', i: '💜', bg: 'var(--violet-soft)', t: 'Belt reading', s: '5 quiet minutes', go: 's-reading' },
+            ];
+            const todo = DUE.filter(d => !done[d.k]);
+
             $('todo').innerHTML = todo.length
-                ? todo.map(x => `<div class="card" onclick="${x.a}" style="cursor:pointer">
+                ? todo.map(x => `<div class="card" onclick="go('${x.go}')" style="cursor:pointer">
         <div class="row"><div class="icon" style="background:${x.bg}">${x.i}</div>
         <div style="flex:1"><div class="ttl">${x.t}</div><div class="sm">${x.s}</div></div>
-        <span class="chip ${x.c}">Log</span></div></div>`).join('')
-                : '<div class="card"><div class="sm">All of today\'s checks are done.</div></div>';
-            $('home-h').textContent = todo.length ? `${todo.length} check${todo.length > 1 ? 's' : ''} left` : 'Today is done';
+        <span class="chip t0">Log</span></div></div>`).join('')
+                : `<div class="card"><div class="sm">Everything for today is logged.</div></div>`;
+            $('home-h').textContent = todo.length
+                ? `${todo.length} check${todo.length > 1 ? 's' : ''} left` : 'Today is done';
+            $('home-p').textContent = todo.length
+                ? 'Tap any card below to log it. Each takes under two minutes.'
+                : 'Nothing outstanding. Come back this evening.';
 
             try {
                 const st = await get(`/api/status/${S.subject}?posture=sitting`);
                 S.status = st;
                 if (st.ready && st.latest) {
                     const ago = Math.round((Date.now() - new Date(st.latest.ts)) / 3600000);
-                    $('fresh').textContent = `LAST BELT READING ${ago < 1 ? 'JUST NOW' : ago + 'H AGO'} · ${st.latest.pct_usable}% CLEAN`;
-                }
-                const cards = (st.cards || []).filter(c => c.tier > 0);
-                $('home-alerts').innerHTML = cards.length ? cards.map(cardHTML).join('')
-                    : `<div class="card"><div class="sm">Nothing crossed a threshold today.</div></div>`;
+                    $('fresh').textContent =
+                        `LAST BELT READING ${ago < 1 ? 'JUST NOW' : ago + 'H AGO'} · ${st.latest.pct_usable}% CLEAN`;
+                } else $('fresh').textContent = 'NO BELT READING YET';
+            } catch (e) { $('fresh').textContent = 'BELT SERVICE UNREACHABLE'; }
+
+            try {
+                const r = await get(`/api/assess/${S.subject}?weeks=${S.weeks}`);
+                S.cards = r.cards || [];
+                const live = S.cards.filter(c => c.tier > 0);
+                $('home-alerts').innerHTML = live.length
+                    ? live.map(cardHTML).join('')
+                    : `<div class="card"><div class="sm">Nothing you have logged crossed a threshold today.</div></div>`;
             } catch (e) {
-                $('home-alerts').innerHTML = `<div class="card"><div class="sm">Can't reach the belt service right now. Your logs are still saved.</div></div>`;
+                $('home-alerts').innerHTML =
+                    `<div class="card"><div class="sm">Can't reach the service right now. Your logs are saved.</div></div>`;
             }
+        }
+
+        /* ═══════════════ reading baseline ═══════════════ */
+        async function loadReadBase() {
+            try {
+                const [b, st] = await Promise.all([
+                    get(`/api/baseline/${S.subject}?posture=sitting`),
+                    get(`/api/status/${S.subject}?posture=sitting`)
+                ]);
+                if (!b.ready) {
+                    $('rd-base').innerHTML = `<div class="card"><div class="ttl">Baseline not ready</div>
+        <div class="sm" style="margin-top:6px">Two clean resting readings are needed before
+        Garbha Sethu will publish your normal range. It will not guess from one.</div></div>`;
+                    return;
+                }
+                const d = st.deviation && st.deviation.ready ? st.deviation : null;
+                $('rd-base').innerHTML = `<div class="two">
+      <div class="stat"><div class="k">Your usual</div>
+        <div class="v">${fmt(b.hr_mean, 0)}<small>bpm</small></div>
+        <div class="sm" style="font-size:11px">${b.n_sessions} sessions</div></div>
+      <div class="stat"><div class="k">Last reading</div>
+        <div class="v">${d ? (d.delta > 0 ? '+' : '') + fmt(d.delta, 0) : '—'}<small>bpm</small></div>
+        <div class="sm" style="font-size:11px">${d ? d.level : 'no data'}</div></div></div>`;
+            } catch (e) { $('rd-base').innerHTML = ''; }
         }
 
         /* ═══════════════ belt reading (live sim from last session) ═══════════════ */
@@ -1778,68 +1961,182 @@
         $('sym-list').innerHTML = SYMS.map(([k, l]) =>
             `<div class="tog" onclick="tog(this,'sym:${k}')"><div class="box">✓</div><span>${l}</span></div>`).join('');
 
-        async function runAssess() {
+        /* ═══════════════ persistence ═══════════════ */
+        const KIND_LABEL = {
+            bp: 'Blood pressure', temp: 'Temperature', weight: 'Weight', iron: 'Iron tablet',
+            hb: 'Haemoglobin', leak: 'Fluid leak', symptoms: 'Symptoms', contractions: 'Contractions'
+        };
+
+        async function saveLog(kind, preset) {
             const num = id => (!$(id) || $(id).value === '') ? null : +$(id).value;
-            const body = {
-                temp_c: num('m-temp'), sbp: num('m-sbp'), dbp: num('m-dbp'),
-                weight_gain_kg: num('m-wt'), prior_hb: num('m-hb'),
-                ifa_missed_days: num('m-ifa') || 0,
-                symptoms: [...S.symptoms], fluid_leak: !!S.leak
-            };
-            const target = current === 's-symptoms' ? 'sym-out' : 'v-out';
-            $(target).innerHTML = '<div class="spin">checking…</div>';
+            let payload = { subject_id: S.subject, kind, gestational_weeks: S.weeks };
+
+            if (kind === 'bp') {
+                payload.value_num = num('l-sbp'); payload.value_num2 = num('l-dbp');
+                if (payload.value_num === null || payload.value_num2 === null)
+                    return flash('o-bp', 'Enter both numbers from your cuff.');
+            }
+            else if (kind === 'temp') {
+                payload.value_num = num('l-temp');
+                if (payload.value_num === null) return flash('o-temp', 'Enter the temperature.');
+            }
+            else if (kind === 'weight') {
+                payload.value_num = num('l-weight');
+                if (payload.value_num === null) return flash('o-weight', 'Enter your weight.');
+            }
+            else if (kind === 'hb') {
+                payload.value_num = num('l-hb');
+                if (payload.value_num === null) return flash('o-hb', 'Enter the haemoglobin value.');
+            }
+            else if (kind === 'iron' || kind === 'leak') { payload.value_num = preset; }
+            else if (kind === 'symptoms') {
+                if (!S.symptoms.size) return flash('o-symptoms', 'Nothing ticked. That is fine — nothing to save.');
+                payload.value_text = JSON.stringify([...S.symptoms]);
+            }
+            else if (kind === 'contractions') {
+                payload.value_text = JSON.stringify(preset);
+                payload.value_num = preset.avg_gap; payload.value_num2 = preset.duration_sec;
+            }
+
+            const out = 'o-' + kind;
+            if ($(out)) $(out).innerHTML = '<div class="spin">saving…</div>';
             try {
-                const r = await post(`/api/assess/${S.subject}?gestational_weeks=${S.weeks}`, body);
-                $(target).innerHTML = r.cards.length ? r.cards.map(cardHTML).join('')
-                    : `<div class="card"><div class="sm">Nothing entered crossed a threshold. That is not an all-clear.</div></div>`;
-                if (current === 's-vitals') S.vitalsDone = true; else S.symDone = true;
-            } catch (e) { $(target).innerHTML = `<div class="err">Could not reach the service.</div>`; }
+                await post('/api/log', payload);
+                S.today = null;                       // force refresh
+                await runAssess(out);
+                loadKindHistory(kind);
+            } catch (e) { flash(out, 'Could not save. Check the connection and try again.'); }
         }
-        function leak() { S.leak = true; go('s-vitals'); setTimeout(runAssess, 150); }
+
+        function flash(id, msg) {
+            if ($(id)) $(id).innerHTML = `<div class="card"><div class="sm">${msg}</div></div>`;
+        }
+
+        /* run every rule against STORED data, not form fields */
+        async function runAssess(targetId) {
+            const t = targetId || 'o-bp';
+            if ($(t)) $(t).innerHTML = '<div class="spin">checking…</div>';
+            try {
+                const r = await get(`/api/assess/${S.subject}?weeks=${S.weeks}`);
+                S.cards = r.cards || [];
+                if ($(t)) $(t).innerHTML = S.cards.length
+                    ? S.cards.map(cardHTML).join('')
+                    : `<div class="card"><div class="sm">Saved. Nothing you have logged crossed a threshold —
+         that is not an all-clear.</div></div>`;
+            } catch (e) { flash(t, 'Saved, but the rules service is unreachable.'); }
+        }
+
+        /* per-screen recent history */
+        async function loadKindHistory(kind) {
+            const el = $('h-' + kind); if (!el) return;
+            try {
+                const logs = await get(`/api/logs/${S.subject}?kind=${kind}&days=28`);
+                if (!logs.length) { el.innerHTML = ''; return; }
+                el.innerHTML = `<div class="sect">Recent</div>` + logs.slice(0, 6).map(l =>
+                    `<div class="card" style="padding:12px 14px"><div style="display:flex;justify-content:space-between">
+        <span class="sm" style="margin:0">${new Date(l.ts).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+        <span class="num" style="font-size:13px">${logValue(l)}</span></div></div>`).join('');
+            } catch (e) { el.innerHTML = ''; }
+        }
+
+        function logValue(l) {
+            switch (l.kind) {
+                case 'bp': return `${l.value_num}/${l.value_num2}`;
+                case 'temp': return `${fmt(l.value_num, 1)} °C`;
+                case 'weight': return `${fmt(l.value_num, 1)} kg`;
+                case 'hb': return `${fmt(l.value_num, 1)} g/dL`;
+                case 'iron': return l.value_num ? 'taken' : 'missed';
+                case 'leak': return 'reported';
+                case 'symptoms': try { return JSON.parse(l.value_text || '[]').length + ' ticked'; } catch (e) { return '—'; }
+                case 'contractions': return `every ${fmt(l.value_num, 0)} min`;
+                default: return '—';
+            }
+        }
+
+        /* full history screen */
+        async function loadHistory() {
+            try {
+                const logs = await get(`/api/logs/${S.subject}?days=28`);
+                if (!logs.length) {
+                    $('hs-list').innerHTML = `<div class="card"><div class="sm">Nothing logged yet.</div></div>`;
+                    $('hs-sub').textContent = 'NOTHING YET'; return;
+                }
+                $('hs-sub').textContent = `${logs.length} ENTRIES · 28 DAYS`;
+                const days = {};
+                logs.forEach(l => {
+                    const d = new Date(l.ts).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
+                    (days[d] = days[d] || []).push(l);
+                });
+                $('hs-list').innerHTML = Object.entries(days).map(([d, items]) =>
+                    `<div class="sect">${d}</div>` + items.map(l =>
+                        `<div class="card" style="padding:13px 14px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><div class="ttl" style="font-size:13.5px">${KIND_LABEL[l.kind] || l.kind}</div>
+              <div class="sm" style="font-size:11px">${new Date(l.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div></div>
+            <span class="num" style="font-size:14px">${logValue(l)}</span></div></div>`).join('')
+                ).join('');
+            } catch (e) { $('hs-list').innerHTML = `<div class="err">Could not load your history.</div>`; }
+        }
 
         /* ═══════════════ contractions ═══════════════ */
         function ctTap() {
             const now = Date.now();
-            S.taps.push(now);
-            if (!S.ctStart) {
-                S.ctStart = now;
-                S.ctTimer = setInterval(() => {
-                    const s = Math.floor((Date.now() - S.ctStart) / 1000);
-                    $('ct-time').textContent =
-                        `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-                }, 500);
+            if (S.ctActive) {                       // ending one
+                S.ctActive = false;
+                S.durations.push((now - S.ctLast) / 1000);
+                $('ct-btn').textContent = 'Contraction started';
+                $('ct-label').textContent = `${S.taps.length} recorded · last lasted ${Math.round(S.durations.at(-1))}s`;
+            } else {                              // starting one
+                S.ctActive = true; S.ctLast = now; S.taps.push(now);
+                $('ct-btn').textContent = 'Contraction ended';
+                if (!S.ctStart) {
+                    S.ctStart = now;
+                    S.ctTimer = setInterval(() => {
+                        const sec = Math.floor((Date.now() - S.ctStart) / 1000);
+                        $('ct-time').textContent =
+                            `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+                    }, 500);
+                }
+                $('ct-label').textContent = 'Contraction in progress…';
             }
             const gaps = S.taps.slice(1).map((t, i) => ((t - S.taps[i]) / 60000));
-            $('ct-label').textContent = `${S.taps.length} contraction${S.taps.length > 1 ? 's' : ''} recorded`;
             $('ct-taps').innerHTML = gaps.map(g => `<b>${g.toFixed(1)} min</b>`).join('');
         }
         function ctReset() {
-            clearInterval(S.ctTimer); S.taps = []; S.ctStart = null;
+            clearInterval(S.ctTimer);
+            S.taps = []; S.durations = []; S.ctStart = null; S.ctActive = false;
             $('ct-time').textContent = '00:00'; $('ct-label').textContent = 'Not started';
             $('ct-taps').innerHTML = ''; $('ct-out').innerHTML = '';
+            if ($('ct-btn')) $('ct-btn').textContent = 'Contraction started';
         }
         async function ctCheck() {
             const gaps = S.taps.slice(1).map((t, i) => ((t - S.taps[i]) / 60000));
             if (gaps.length < 2) {
-                $('ct-out').innerHTML =
-                '<div class="card"><div class="sm">Record at least three contractions so there is a pattern to read.</div></div>'; return;
+                return flash('ct-out', 'Record at least three contractions so there is a pattern to read.');
             }
             const hrs = (Date.now() - S.ctStart) / 3600000;
+            const dur = S.durations.length
+                ? S.durations.reduce((a, b) => a + b, 0) / S.durations.length : 45;
+            const avg = gaps.reduce((a, b) => a + b, 0) / gaps.length;
             try {
                 const r = await post('/api/contractions', {
-                    gestational_weeks: S.weeks, intervals_min: gaps, duration_sec: 55, hours_ongoing: hrs
+                    gestational_weeks: S.weeks, intervals_min: gaps,
+                    duration_sec: dur, hours_ongoing: hrs
                 });
                 $('ct-out').innerHTML = cardHTML(r);
-            } catch (e) { $('ct-out').innerHTML = `<div class="err">Could not reach the service.</div>`; }
+                saveLog('contractions', {
+                    avg_gap: avg, duration_sec: dur,
+                    count: S.taps.length, hours: hrs
+                });
+            } catch (e) { flash('ct-out', 'Could not reach the service.'); }
         }
-
 
         /* ═══════════════ watch (combined signals) ═══════════════ */
         async function loadWatch() {
             const has = {
                 pulse: false, baseline: false, belt: false, weather: false,
-                bp: false, temp: false, sym: S.symptoms.size > 0, hb: false,
-                weight: false, leak: !!S.leak, taps: S.taps.length > 1
+                bp: false, temp: false, sym: false, hb: false,
+                weight: false, leak: false, taps: false
             };
             let st = null, ht = null;
             try {
@@ -1851,9 +2148,18 @@
                 ht = await get('/api/heat');
                 has.belt = !!(ht && ht.belt); has.weather = !!(ht && ht.outdoor);
             } catch (e) { }
-            const num = id => (!$(id) || $(id).value === '') ? null : +$(id).value;
-            has.bp = num('m-sbp') !== null; has.temp = num('m-temp') !== null;
-            has.hb = num('m-hb') !== null; has.weight = num('m-wt') !== null;
+            let L = {};
+            try {
+                const logs = await get(`/api/logs/${S.subject}?days=28`);
+                S.logs = logs;
+                logs.forEach(l => { if (!L[l.kind]) L[l.kind] = l; });   // newest per kind
+            } catch (e) { }
+            has.bp = !!L.bp; has.temp = !!L.temp; has.hb = !!L.hb;
+            has.weight = !!L.weight; has.leak = !!L.leak; has.taps = !!L.contractions;
+            has.sym = !!L.symptoms;
+            const symList = L.symptoms ? JSON.parse(L.symptoms.value_text || '[]') : [];
+            const num = k => L[k] ? L[k].value_num : null;
+            const num2 = k => L[k] ? L[k].value_num2 : null;
 
             const dev = (st && st.deviation && st.deviation.ready) ? st.deviation : null;
             const lvl = dev ? dev.level : null;
@@ -1864,8 +2170,8 @@
                     n: 'Fever and infection', ic: '🌡',
                     feeds: [['Resting pulse', has.baseline], ['Your baseline', has.baseline],
                     ['Thermometer', has.temp], ['Symptoms', has.sym]],
-                    tier: has.temp && num('m-temp') >= 38 ? 3 : raised ? 2 : 0,
-                    say: has.temp && num('m-temp') >= 38
+                    tier: has.temp && num('temp') >= 38 ? 3 : raised ? 2 : 0,
+                    say: has.temp && num('temp') >= 38
                         ? 'Measured temperature is 38 C or above with a raised pulse. That combination needs a clinician today.'
                         : raised ? `Pulse is ${dev.delta > 0 ? '+' : ''}${dev.delta} bpm against your usual. Confirm with a thermometer before anyone reacts.`
                             : 'Pulse sits in your usual range. The belt cannot measure body temperature, so a thermometer is always the confirming step.'
@@ -1873,9 +2179,9 @@
 
                 {
                     n: 'Low haemoglobin', ic: '🩸',
-                    feeds: [['Resting pulse', has.baseline], ['Tiredness', S.symptoms.has('tiredness')],
-                    ['Breathlessness', S.symptoms.has('breathlessness')], ['Last Hb', has.hb], ['Iron adherence', true]],
-                    tier: (raised && S.symptoms.size >= 2) || (has.hb && num('m-hb') < 11) ? 2 : 0,
+                    feeds: [['Resting pulse', has.baseline], ['Tiredness', symList.includes('tiredness')],
+                    ['Breathlessness', symList.includes('breathlessness')], ['Last Hb', has.hb], ['Iron adherence', !!L.iron]],
+                    tier: (raised && symList.length >= 2) || (has.hb && num('hb') < 11) ? 2 : 0,
                     say: 'Anaemia makes the heart beat faster to move the same oxygen. A raised resting pulse with tiredness or breathlessness is a reason to ask for a blood test, not a diagnosis.'
                 },
 
@@ -1892,8 +2198,8 @@
                     n: 'Pre-eclampsia', ic: '🩺',
                     feeds: [['Blood pressure', has.bp], ['Weekly weight', has.weight],
                     ['Red-flag symptoms', has.sym], ['Gestosis score', true]],
-                    tier: (has.bp && (num('m-sbp') >= 140 || num('m-dbp') >= 90)) ? 3
-                        : (S.symptoms.has('headache') || S.symptoms.has('vision') || S.symptoms.has('swelling')) ? 2 : 0,
+                    tier: (has.bp && (num('bp') >= 140 || num2('bp') >= 90)) ? 3
+                        : (symList.includes('headache') || symList.includes('vision') || symList.includes('swelling')) ? 2 : 0,
                     say: 'Blood pressure is the single most important number in pregnancy and no wearable can measure it. Log it from your cuff and the rules do the rest.'
                 },
 

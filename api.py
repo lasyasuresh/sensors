@@ -379,3 +379,117 @@ def quality_model(session_id: str):
         "actual_usable": int(actual.sum()),
         "agreement": round(float(((p >= 0.5) == actual).mean()), 3),
     }
+
+
+# ═══════════════ manual logs ═══════════════
+class LogEntry(BaseModel):
+    subject_id: str
+    kind: str
+    value_num: Optional[float] = None
+    value_num2: Optional[float] = None
+    value_text: Optional[str] = None
+    gestational_weeks: Optional[int] = None
+
+
+@app.post("/api/log")
+def add_log(e: LogEntry):
+    row = e.model_dump()
+    row["ts"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    sb.table("logs").insert(row).execute()
+    return {"ok": True, "kind": e.kind}
+
+
+@app.get("/api/logs/{subject_id}")
+def get_logs(subject_id: str, kind: Optional[str] = None, days: int = 28):
+    since = (datetime.datetime.now(datetime.timezone.utc)
+             - datetime.timedelta(days=days)).isoformat()
+    q = (sb.table("logs").select("*")
+           .eq("subject_id", subject_id).gte("ts", since)
+           .order("ts", desc=True).limit(500))
+    if kind:
+        q = q.eq("kind", kind)
+    return q.execute().data
+
+
+@app.get("/api/today/{subject_id}")
+def today(subject_id: str):
+    start = datetime.datetime.now(datetime.timezone.utc).replace(
+        hour=0, minute=0, second=0, microsecond=0).isoformat()
+    rows = (sb.table("logs").select("kind")
+              .eq("subject_id", subject_id).gte("ts", start)
+              .limit(200).execute().data)
+    done = {r["kind"]: True for r in rows}
+
+    sess = session_rollup(fetch_subject(subject_id, days=1))
+    if sess:
+        done["reading"] = True
+    return {"done": done, "date": start[:10]}
+
+
+def _latest_logs(subject_id, days=28):
+    since = (datetime.datetime.now(datetime.timezone.utc)
+             - datetime.timedelta(days=days)).isoformat()
+    rows = (sb.table("logs").select("*")
+              .eq("subject_id", subject_id).gte("ts", since)
+              .order("ts", desc=True).limit(500).execute().data)
+    latest = {}
+    for r in rows:
+        latest.setdefault(r["kind"], r)
+    return latest, rows
+
+
+@app.get("/api/assess/{subject_id}")
+def assess_stored(subject_id: str, weeks: int = 28):
+    """Run every rule against what the person has actually logged."""
+    import json as _json
+    L, all_rows = _latest_logs(subject_id)
+    cards = []
+
+    sbp = L["bp"]["value_num"] if "bp" in L else None
+    dbp = L["bp"]["value_num2"] if "bp" in L else None
+    temp = L["temp"]["value_num"] if "temp" in L else None
+    hb = L["hb"]["value_num"] if "hb" in L else None
+    syms = _json.loads(L["symptoms"]["value_text"] or "[]") if "symptoms" in L else []
+
+    missed = sum(1 for r in all_rows
+                 if r["kind"] == "iron" and not r.get("value_num"))
+
+    dev = {"ready": False}
+    try:
+        rest = [s for s in session_rollup(fetch_subject(subject_id))
+                if (s["context"] or "") in REST]
+        if rest:
+            dev = bl.deviation(subject_id, rest[-1]["hr_mean"], posture="sitting")
+    except Exception:
+        pass
+
+    if dev.get("ready"):
+        cards.append({"module": "fever", **rules.fever_screen(dev, symptoms=syms)})
+        cards.append({"module": "anaemia", **rules.anaemia_screen(
+            dev, symptoms=syms, prior_hb=hb, ifa_missed_days=missed)})
+
+    if any(v is not None for v in (temp, sbp, dbp)):
+        cards.append({"module": "vitals", **rules.vitals_check(
+            temp_c=temp, sbp=sbp, dbp=dbp)})
+
+    if syms:
+        cards.append({"module": "symptoms", **rules.symptom_check(
+            syms, sbp=sbp, dbp=dbp)})
+
+    weights = sorted([r for r in all_rows if r["kind"] == "weight"],
+                     key=lambda r: r["ts"])
+    if len(weights) >= 2:
+        gain = weights[-1]["value_num"] - weights[-2]["value_num"]
+        cards.append({"module": "weight", **rules.weight_check(
+            kg_gained_this_week=gain, sbp=sbp, dbp=dbp)})
+
+    if "leak" in L:
+        age_h = (datetime.datetime.now(datetime.timezone.utc)
+                 - pd.to_datetime(L["leak"]["ts"]).to_pydatetime()).total_seconds() / 3600
+        if age_h < 48:
+            cards.append({"module": "prom", **rules.fluid_leak(
+                gestational_weeks=weeks, dev=dev, temp_c=temp)})
+
+    cards = [c for c in cards if c["tier"] > 0]
+    cards.sort(key=lambda c: -c["tier"])
+    return {"cards": cards, "max_tier": max([c["tier"] for c in cards], default=0)}
