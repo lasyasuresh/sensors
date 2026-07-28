@@ -706,6 +706,125 @@
             }
         }
 
+        /* ---------- swipe deck ---------- */
+        .deck {
+            position: relative;
+            height: 290px;
+            margin-top: 4px;
+            touch-action: none;
+            user-select: none
+        }
+
+        .swipe-card {
+            position: absolute;
+            inset: 0;
+            background: #fff;
+            border: 1px solid var(--hair);
+            border-radius: 24px;
+            padding: 26px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 10px 30px -14px rgba(46, 32, 84, .26);
+            will-change: transform;
+            cursor: grab
+        }
+
+        .swipe-card:active {
+            cursor: grabbing
+        }
+
+        .swipe-card .ic {
+            font-size: 40px;
+            margin-bottom: 18px
+        }
+
+        .swipe-card .q {
+            font-family: var(--display);
+            font-size: 21px;
+            font-weight: 800;
+            line-height: 1.32;
+            letter-spacing: -.01em
+        }
+
+        .swipe-card .hint {
+            font-size: 11.5px;
+            color: var(--muted);
+            margin-top: 16px;
+            line-height: 1.5
+        }
+
+        .stamp {
+            position: absolute;
+            top: 22px;
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: .16em;
+            padding: 7px 15px;
+            border-radius: 10px;
+            border: 2.5px solid;
+            opacity: 0;
+            pointer-events: none
+        }
+
+        .stamp.yes {
+            right: 20px;
+            color: var(--violet);
+            border-color: var(--violet);
+            transform: rotate(13deg)
+        }
+
+        .stamp.no {
+            left: 20px;
+            color: var(--teal);
+            border-color: var(--teal);
+            transform: rotate(-13deg)
+        }
+
+        .deck-prog {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            margin-top: 14px
+        }
+
+        .deck-prog i {
+            height: 3px;
+            width: 26px;
+            border-radius: 99px;
+            background: var(--hair);
+            transition: .3s
+        }
+
+        .deck-prog i.done {
+            background: var(--violet)
+        }
+
+        .deck-btns {
+            display: flex;
+            gap: 11px;
+            margin-top: 14px
+        }
+
+        .deck-btns button {
+            flex: 1;
+            padding: 15px;
+            font-size: 14.5px
+        }
+
+        .btn-no {
+            background: var(--teal-soft);
+            color: var(--teal)
+        }
+
+        .btn-yes {
+            background: var(--violet-soft);
+            color: var(--violet)
+        }
+
         /* ---------- watch rows ---------- */
         .wrow {
             background: #fff;
@@ -1349,8 +1468,9 @@
 
                 <!-- step 3 -->
                 <div class="ob" data-step="3" style="display:none">
-                    <p class="lede" style="margin-bottom:20px">Tick anything that applies. This is the FOGSI gestosis
-                        score, used across India to decide who needs closer watching.</p>
+                    <p class="lede" style="margin-bottom:20px">Tick anything that applies — leave the rest blank.
+                        Most of these feed the FOGSI gestosis score, used across India to decide who needs
+                        closer watching. Your history stays private and is only shown to you and your doctor.</p>
                     <div class="tog" onclick="tog(this,'prior_pe')">
                         <div class="box">✓</div><span>Pre-eclampsia in a past pregnancy</span>
                     </div>
@@ -1368,6 +1488,12 @@
                     </div>
                     <div class="tog" onclick="tog(this,'family_pe')">
                         <div class="box">✓</div><span>Mother or sister had pre-eclampsia</span>
+                    </div>
+                    <div class="tog" onclick="tog(this,'prior_loss')">
+                        <div class="box">✓</div><span>A previous pregnancy ended in miscarriage</span>
+                    </div>
+                    <div class="tog" onclick="tog(this,'prior_mtp')">
+                        <div class="box">✓</div><span>A previous pregnancy was medically ended</span>
                     </div>
                 </div>
 
@@ -1425,8 +1551,14 @@
 
                 <div class="fresh"><i class="dot"></i><span id="fresh">NO READING YET TODAY</span></div>
 
-                <div class="sect">Needs you</div>
-                <div id="todo"></div>
+                <div class="sect">How are you feeling today?</div>
+                <div class="deck" id="deck"></div>
+                <div class="deck-prog" id="deck-prog"></div>
+                <div class="deck-btns" id="deck-btns">
+                    <button class="btn-no" onclick="deckBtn(false)">No</button>
+                    <button class="btn-yes" onclick="deckBtn(true)">Yes</button>
+                </div>
+                <div id="deck-out" style="margin-top:12px"></div>
 
                 <div class="sect">What the system is saying</div>
                 <div id="home-alerts">
@@ -2168,25 +2300,12 @@
                 S.today = t; done = t.done || {};
             } catch (e) { }
 
-            const DUE = [
-                { k: 'bp', i: '🩺', bg: 'var(--amber-soft)', t: 'Blood pressure', s: 'Due today · 2 min', go: 's-bp' },
-                { k: 'symptoms', i: '📋', bg: 'var(--violet-soft)', t: 'How you feel', s: 'Quick checklist', go: 's-symptoms' },
-                { k: 'iron', i: '💊', bg: 'var(--violet-soft)', t: 'Iron tablet', s: 'Tick when taken', go: 's-iron' },
-                { k: 'reading', i: '💜', bg: 'var(--violet-soft)', t: 'Belt reading', s: '5 quiet minutes', go: 's-reading' },
-            ];
-            const todo = DUE.filter(d => !done[d.k]);
-
-            $('todo').innerHTML = todo.length
-                ? todo.map(x => `<div class="card" onclick="go('${x.go}')" style="cursor:pointer">
-        <div class="row"><div class="icon" style="background:${x.bg}">${x.i}</div>
-        <div style="flex:1"><div class="ttl">${x.t}</div><div class="sm">${x.s}</div></div>
-        <span class="chip t0">Log</span></div></div>`).join('')
-                : `<div class="card"><div class="sm">Everything for today is logged.</div></div>`;
-            $('home-h').textContent = todo.length
-                ? `${todo.length} check${todo.length > 1 ? 's' : ''} left` : 'Today is done';
-            $('home-p').textContent = todo.length
-                ? 'Tap any card below to log it. Each takes under two minutes.'
-                : 'Nothing outstanding. Come back this evening.';
+            if (done.symptoms) { deckDone(0, true); }
+            else { initDeck(); }
+            $('home-h').textContent = done.symptoms ? 'Check-in done' : 'Two minutes';
+            $('home-p').textContent = done.symptoms
+                ? 'You have already told us how you feel today. Use the Log tab for anything else.'
+                : 'Swipe through a few quick questions. Right for yes, left for no.';
 
             try {
                 const st = await get(`/api/status/${S.subject}?posture=sitting`);
@@ -2208,6 +2327,128 @@
             } catch (e) {
                 $('home-alerts').innerHTML =
                     `<div class="card"><div class="sm">Can't reach the service right now. Your logs are saved.</div></div>`;
+            }
+        }
+
+        /* ═══════════════ swipe deck ═══════════════ */
+        const DECK_ICONS = {
+            headache: '\u{1F915}', vision: '\u{1F441}\uFE0F', epigastric: '\u{1FAC3}', swelling: '\u{1F932}',
+            reduced_urine: '\u{1F4A7}', tiredness: '\u{1F634}', breathlessness: '\u{1FAC1}', dizziness: '\u{1F4AB}'
+        };
+
+        function initDeck() {
+            S.deckIndex = 0;
+            S.deckAnswers = {};
+            S.symptoms.clear();
+            $('deck-btns').style.display = 'flex';
+            $('deck-out').innerHTML = '';
+            renderDeck();
+        }
+
+        function paintProg() {
+            $('deck-prog').innerHTML = SYMS.map((_, i) =>
+                `<i class="${i < S.deckIndex ? 'done' : ''}"></i>`).join('');
+        }
+
+        function renderDeck() {
+            if (S.deckIndex >= SYMS.length) { finishDeck(); return; }
+            const slice = SYMS.slice(S.deckIndex, S.deckIndex + 3);
+            $('deck').innerHTML = slice.slice().reverse().map((sym, i) => {
+                const [k, l] = sym;
+                const depth = slice.length - 1 - i;
+                return `<div class="swipe-card" data-key="${k}" style="
+          transform:translateY(${depth * 9}px) scale(${1 - depth * 0.045})">
+          <div class="stamp yes">YES</div><div class="stamp no">NO</div>
+          <div class="ic">${DECK_ICONS[k] || '\u2022'}</div>
+          <div class="q">${l}?</div>
+          <div class="hint">Swipe right for yes, left for no</div>
+        </div>`;
+            }).join('');
+            wireTopCard();
+            paintProg();
+        }
+
+        function wireTopCard() {
+            const card = $('deck').lastElementChild;
+            if (!card) return;
+            const yes = card.querySelector('.stamp.yes');
+            const no = card.querySelector('.stamp.no');
+            let sx = 0, sy = 0, dx = 0, dy = 0, dragging = false;
+
+            card.addEventListener('pointerdown', e => {
+                dragging = true; sx = e.clientX; sy = e.clientY;
+                card.style.transition = 'none';
+                try { card.setPointerCapture(e.pointerId); } catch (err) { }
+            });
+            card.addEventListener('pointermove', e => {
+                if (!dragging) return;
+                dx = e.clientX - sx; dy = e.clientY - sy;
+                card.style.transform =
+                    `translate(${dx}px, ${dy * 0.28}px) rotate(${dx * 0.055}deg)`;
+                yes.style.opacity = Math.max(0, Math.min(1, dx / 85));
+                no.style.opacity = Math.max(0, Math.min(1, -dx / 85));
+            });
+            const release = () => {
+                if (!dragging) return;
+                dragging = false;
+                card.style.transition = 'transform .34s cubic-bezier(.2,.8,.3,1), opacity .34s';
+                if (Math.abs(dx) > 85) { card._commit(dx > 0); }
+                else {
+                    card.style.transform = '';
+                    yes.style.opacity = 0; no.style.opacity = 0;
+                }
+            };
+            card.addEventListener('pointerup', release);
+            card.addEventListener('pointercancel', release);
+
+            card._commit = ans => {
+                card.style.transition = 'transform .34s cubic-bezier(.2,.8,.3,1), opacity .34s';
+                card.style.transform =
+                    `translate(${ans ? 620 : -620}px, ${dy}px) rotate(${ans ? 32 : -32}deg)`;
+                card.style.opacity = '0';
+                answerDeck(card.dataset.key, ans);
+            };
+        }
+
+        function deckBtn(ans) {
+            const card = $('deck').lastElementChild;
+            if (card && card._commit) card._commit(ans);
+        }
+
+        function answerDeck(key, yes) {
+            S.deckAnswers[key] = yes;
+            if (yes) S.symptoms.add(key); else S.symptoms.delete(key);
+            S.deckIndex++;
+            setTimeout(renderDeck, 280);
+        }
+
+        function deckDone(count, already) {
+            $('deck').innerHTML = `<div class="swipe-card" style="cursor:default;box-shadow:none;
+        background:var(--violet-soft);border-color:#DCD1F6">
+        <div class="ic">\u{1F33F}</div>
+        <div class="q">${already ? 'Already checked in' : 'Thank you'}</div>
+        <div class="hint">${already
+                    ? 'You have told us how you feel today.'
+                    : count ? `${count} thing${count > 1 ? 's' : ''} noted for your doctor.`
+                        : 'Nothing to report today. That is not an all-clear.'}</div>
+      </div>`;
+            $('deck-btns').style.display = 'none';
+            $('deck-prog').innerHTML = '';
+        }
+
+        async function finishDeck() {
+            const count = Object.values(S.deckAnswers).filter(Boolean).length;
+            deckDone(count, false);
+            try {
+                await post('/api/log', {
+                    subject_id: S.subject, kind: 'symptoms',
+                    gestational_weeks: S.weeks,
+                    value_text: JSON.stringify([...S.symptoms])
+                });
+                await runAssess('deck-out');
+            } catch (e) {
+                $('deck-out').innerHTML =
+                    `<div class="card"><div class="sm">Saved locally \u2014 could not reach the service.</div></div>`;
             }
         }
 
@@ -2784,12 +3025,19 @@
                     chronic_htn: !!S.flags.chronic_htn, diabetes: !!S.flags.diabetes,
                     multiple: !!S.flags.multiple, family_pe: !!S.flags.family_pe
                 });
+                const hist = [];
+                if (S.flags.prior_loss) hist.push('Previous miscarriage');
+                if (S.flags.prior_mtp) hist.push('Previous medical termination');
+                const histHTML = hist.length
+                    ? `<div class="card"><div class="ttl" style="font-size:13.5px">Obstetric history</div>
+                       <div class="sm" style="margin-top:6px">${hist.join(' \u00B7 ')}. Not part of the gestosis
+                       score, but worth mentioning at your visit.</div></div>` : '';
                 $('pr-gest').innerHTML =
                     `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center">
         <div><div class="sm">FOGSI gestosis score</div>
           <div class="num" style="font-size:32px;margin-top:3px">${g.score}<span style="font-size:14px;color:var(--muted)"> pts</span></div></div>
         <span class="chip t${g.result.tier}">${g.high_risk ? 'High risk' : 'Standard'}</span></div></div>` +
-                    cardHTML(g.result);
+                    cardHTML(g.result) + histHTML;
             } catch (e) { $('pr-gest').innerHTML = `<div class="err">Could not calculate.</div>`; }
 
             try {
