@@ -1,0 +1,8 @@
+*.pkl
+*.csv
+*.db
+*.pdf
+pi/
+__pycache__/
+.venv/
+.env

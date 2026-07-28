@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/index.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/logo.mp4", "dest": "/public/logo.mp4" },
+    { "src": "/(.*)", "dest": "api/index.py" }
+  ]
+}
