@@ -1953,6 +1953,16 @@
     <script>
         /* ═══════════════ state ═══════════════ */
         const API = '';
+        let PI = localStorage.getItem('piUrl') || '';
+(function(){
+  const q = new URLSearchParams(location.search).get('pi');
+  if(q){ PI = q.replace(/\/$/,''); localStorage.setItem('piUrl', PI); }
+})();
+function setPi(){
+  const v = prompt('Belt address', PI || 'https://xxx.trycloudflare.com');
+  if(v !== null){ PI = v.replace(/\/$/,''); localStorage.setItem('piUrl', PI); }
+}
+        
         const S = {
             user: { name: 'Priya', phone: '' },
             flags: { primi: true },
