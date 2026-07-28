@@ -2085,8 +2085,8 @@
                 <button class="btn ghost" onclick="location.reload()" style="margin-top:10px">Sign out</button>
 
                 <div class="footnote">
-                    Pulse and oxygen come from an calibrated MAX30100 worn at home. Temperature and
-                    humidity are from a DHT11.
+                    Pulse and oxygen come from an uncalibrated MAX30100 worn at home. Temperature and
+                    humidity are ambient air from a DHT11, not body measurements. Nothing here is a diagnosis.
                 </div>
             </div>
             <nav class="nav"></nav>
@@ -2350,17 +2350,8 @@
                 } else $('fresh').textContent = 'NO BELT READING YET';
             } catch (e) { $('fresh').textContent = 'BELT SERVICE UNREACHABLE'; }
 
-            try {
-                const r = await get(`/api/assess/${S.subject}?weeks=${S.weeks}`);
-                S.cards = r.cards || [];
-                const live = S.cards.filter(c => c.tier > 0);
-                $('home-alerts').innerHTML = live.length
-                    ? live.map(cardHTML).join('')
-                    : `<div class="card"><div class="sm">Nothing you have logged crossed a threshold today.</div></div>`;
-            } catch (e) {
-                $('home-alerts').innerHTML =
-                    `<div class="card"><div class="sm">Can't reach the service right now. Your logs are saved.</div></div>`;
-            }
+            $('home-alerts').innerHTML =
+                `<div class="card"><div class="sm">Answer the questions above. Anything worth acting on will appear here.</div></div>`;
         }
 
         /* ═══════════════ swipe deck ═══════════════ */
@@ -2478,7 +2469,7 @@
                     gestational_weeks: S.weeks,
                     value_text: JSON.stringify([...S.symptoms])
                 });
-                await runAssess('deck-out');
+                await runAssess('home-alerts');
             } catch (e) {
                 $('deck-out').innerHTML =
                     `<div class="card"><div class="sm">Saved locally \u2014 could not reach the service.</div></div>`;
@@ -3319,6 +3310,7 @@
             "BELT SERVICE UNREACHABLE": "ಬೆಲ್ಟ್ ಸೇವೆ ಲಭ್ಯವಿಲ್ಲ",
             "Nothing logged yet.": "ಇನ್ನೂ ಏನೂ ದಾಖಲಿಸಿಲ್ಲ.",
             "Nothing you have logged crossed a threshold today.": "ಇಂದು ನೀವು ದಾಖಲಿಸಿದ ಯಾವುದೂ ಮಿತಿ ದಾಟಿಲ್ಲ.",
+            "Answer the questions above. Anything worth acting on will appear here.": "ಮೇಲಿನ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರಿಸಿ. ಗಮನ ಹರಿಸಬೇಕಾದದ್ದು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ.",
         };
 
         let LANG = localStorage.getItem('gsLang') || 'en';
