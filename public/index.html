@@ -2300,12 +2300,9 @@
                 S.today = t; done = t.done || {};
             } catch (e) { }
 
-            if (done.symptoms) { deckDone(0, true); }
-            else { initDeck(); }
-            $('home-h').textContent = done.symptoms ? 'Check-in done' : 'Two minutes';
-            $('home-p').textContent = done.symptoms
-                ? 'You have already told us how you feel today. Use the Log tab for anything else.'
-                : 'Swipe through a few quick questions. Right for yes, left for no.';
+           initDeck();
+            $('home-h').textContent = 'Two minutes';
+            $('home-p').textContent = 'Swipe through a few quick questions. Right for yes, left for no.';
 
             try {
                 const st = await get(`/api/status/${S.subject}?posture=sitting`);
