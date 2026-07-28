@@ -825,6 +825,38 @@
             color: var(--violet)
         }
 
+        /* ---------- language toggle ---------- */
+        .langtog {
+            position: absolute;
+            top: 14px;
+            right: 18px;
+            display: flex;
+            background: rgba(255, 255, 255, .94);
+            border: 1px solid var(--hair);
+            border-radius: 99px;
+            padding: 3px;
+            z-index: 40;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 10px -4px rgba(46, 32, 84, .22)
+        }
+
+        .langtog button {
+            width: auto;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 99px;
+            background: transparent;
+            color: var(--muted);
+            line-height: 1.35;
+            letter-spacing: .01em
+        }
+
+        .langtog button.on {
+            background: var(--violet-soft);
+            color: var(--violet)
+        }
+
         /* ---------- watch rows ---------- */
         .wrow {
             background: #fff;
@@ -1333,6 +1365,10 @@
 
         <!-- ══════════════════ TERMS ══════════════════ -->
         <section class="screen" id="s-terms">
+            <div class="langtog">
+                <button id="lg-en" class="on" onclick="setLang('en')">EN</button>
+                <button id="lg-kn" onclick="setLang('kn')">ಕನ್ನಡ</button>
+            </div>
             <div class="body" style="padding-top:34px">
                 <h2 class="big">Before we start</h2>
                 <p class="lede">Three things you need to know. Please read them — they matter.</p>
@@ -3047,6 +3083,316 @@
             } catch (e) { $('pr-base').innerHTML = ''; }
         }
         function downloadReport() { window.open(`${API}/api/report/${S.subject}`, '_blank'); }
+
+        /* ═══════════════ language ═══════════════ */
+        const KN = {
+            /* ---- terms ---- */
+            "Before we start": "ಪ್ರಾರಂಭಿಸುವ ಮೊದಲು",
+            "Three things you need to know. Please read them — they matter.": "ನೀವು ತಿಳಿಯಬೇಕಾದ ಮೂರು ವಿಷಯಗಳು. ದಯವಿಟ್ಟು ಓದಿ — ಇವು ಮುಖ್ಯ.",
+            "Please confirm": "ದಯವಿಟ್ಟು ದೃಢೀಕರಿಸಿ",
+            "Garbha Sethu is not a doctor.": "ಗರ್ಭ ಸೇತು ವೈದ್ಯರಲ್ಲ.",
+            "It cannot diagnose anything. It looks for changes worth mentioning at your next visit.": "ಇದು ಯಾವುದೇ ಕಾಯಿಲೆಯನ್ನು ಪತ್ತೆ ಮಾಡಲಾರದು. ಮುಂದಿನ ಭೇಟಿಯಲ್ಲಿ ವೈದ್ಯರಿಗೆ ಹೇಳಬೇಕಾದ ಬದಲಾವಣೆಗಳನ್ನು ಮಾತ್ರ ಗಮನಿಸುತ್ತದೆ.",
+            "No alert does not mean you are well.": "ಎಚ್ಚರಿಕೆ ಬರಲಿಲ್ಲ ಎಂದರೆ ನೀವು ಆರೋಗ್ಯವಾಗಿದ್ದೀರಿ ಎಂದರ್ಥವಲ್ಲ.",
+            "If something feels wrong, contact your doctor whether or not this app says anything.": "ಏನಾದರೂ ಸರಿ ಇಲ್ಲ ಎನಿಸಿದರೆ, ಈ ಆ್ಯಪ್ ಏನೇ ಹೇಳಿದರೂ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.",
+            "In an emergency, do not open this app.": "ತುರ್ತು ಪರಿಸ್ಥಿತಿಯಲ್ಲಿ ಈ ಆ್ಯಪ್ ತೆರೆಯಬೇಡಿ.",
+            "Call your provider or go to hospital.": "ವೈದ್ಯರಿಗೆ ಕರೆ ಮಾಡಿ ಅಥವಾ ಆಸ್ಪತ್ರೆಗೆ ಹೋಗಿ.",
+            "I understand, continue": "ಅರ್ಥವಾಯಿತು, ಮುಂದುವರಿಸಿ",
+
+            /* ---- login / otp ---- */
+            "Welcome": "ಸ್ವಾಗತ",
+            "Sign in to pick up where you left off.": "ನಿಲ್ಲಿಸಿದಲ್ಲಿಂದ ಮುಂದುವರಿಸಲು ಸೈನ್ ಇನ್ ಮಾಡಿ.",
+            "Your name": "ನಿಮ್ಮ ಹೆಸರು",
+            "Mobile number": "ಮೊಬೈಲ್ ಸಂಖ್ಯೆ",
+            "Continue": "ಮುಂದುವರಿಸಿ",
+            "Demo build — no real account is created.": "ಡೆಮೊ ಆವೃತ್ತಿ — ನಿಜವಾದ ಖಾತೆ ತೆರೆಯುವುದಿಲ್ಲ.",
+            "Verify your number": "ನಿಮ್ಮ ಸಂಖ್ಯೆಯನ್ನು ದೃಢೀಕರಿಸಿ",
+            "CODE SENT": "ಕೋಡ್ ಕಳುಹಿಸಲಾಗಿದೆ",
+            "Verify": "ದೃಢೀಕರಿಸಿ",
+            "Resend code": "ಕೋಡ್ ಮತ್ತೆ ಕಳುಹಿಸಿ",
+            "Your number is used to keep your readings on your own account. It is never shared.": "ನಿಮ್ಮ ಅಳತೆಗಳನ್ನು ನಿಮ್ಮದೇ ಖಾತೆಯಲ್ಲಿ ಇರಿಸಲು ಮಾತ್ರ ಸಂಖ್ಯೆ ಬಳಸಲಾಗುತ್ತದೆ. ಬೇರೆಯವರೊಂದಿಗೆ ಹಂಚಿಕೊಳ್ಳುವುದಿಲ್ಲ.",
+
+            /* ---- onboarding ---- */
+            "About you": "ನಿಮ್ಮ ಬಗ್ಗೆ",
+            "Your pregnancy": "ನಿಮ್ಮ ಗರ್ಭಾವಸ್ಥೆ",
+            "Risk factors": "ಅಪಾಯದ ಅಂಶಗಳು",
+            "This sets your personal baseline. Nothing is shared.": "ಇದು ನಿಮ್ಮ ಸ್ವಂತ ಸಾಮಾನ್ಯ ಮಟ್ಟವನ್ನು ನಿಗದಿಪಡಿಸುತ್ತದೆ. ಯಾವುದನ್ನೂ ಹಂಚಿಕೊಳ್ಳುವುದಿಲ್ಲ.",
+            "Age": "ವಯಸ್ಸು",
+            "Weight (kg)": "ತೂಕ (ಕೆ.ಜಿ)",
+            "Height (cm)": "ಎತ್ತರ (ಸೆ.ಮೀ)",
+            "BMI": "ಬಿಎಂಐ",
+            "Gestational age decides which rules apply — especially for contractions.": "ಗರ್ಭಾವಸ್ಥೆಯ ವಾರಗಳು ಯಾವ ನಿಯಮಗಳು ಅನ್ವಯಿಸುತ್ತವೆ ಎಂದು ನಿರ್ಧರಿಸುತ್ತವೆ — ವಿಶೇಷವಾಗಿ ಹೊಟ್ಟೆನೋವಿಗೆ.",
+            "Weeks pregnant": "ಗರ್ಭಧಾರಣೆಯ ವಾರಗಳು",
+            "Days": "ದಿನಗಳು",
+            "Blood pressure (from your cuff)": "ರಕ್ತದೊತ್ತಡ (ನಿಮ್ಮ ಯಂತ್ರದಿಂದ)",
+            "This is my first pregnancy": "ಇದು ನನ್ನ ಮೊದಲ ಗರ್ಭಧಾರಣೆ",
+            "Tick anything that applies — leave the rest blank. Most of these feed the FOGSI gestosis score, used across India to decide who needs closer watching. Your history stays private and is only shown to you and your doctor.": "ಅನ್ವಯವಾಗುವುದನ್ನು ಗುರುತಿಸಿ — ಉಳಿದವನ್ನು ಖಾಲಿ ಬಿಡಿ. ಇವುಗಳಲ್ಲಿ ಹೆಚ್ಚಿನವು FOGSI ಗೆಸ್ಟೋಸಿಸ್ ಅಂಕಕ್ಕೆ ಸೇರುತ್ತವೆ, ಯಾರಿಗೆ ಹೆಚ್ಚಿನ ಗಮನ ಬೇಕು ಎಂದು ನಿರ್ಧರಿಸಲು ಭಾರತದಾದ್ಯಂತ ಬಳಸಲಾಗುತ್ತದೆ. ನಿಮ್ಮ ಮಾಹಿತಿ ಗೌಪ್ಯವಾಗಿರುತ್ತದೆ, ನಿಮಗೆ ಮತ್ತು ನಿಮ್ಮ ವೈದ್ಯರಿಗೆ ಮಾತ್ರ ಕಾಣಿಸುತ್ತದೆ.",
+            "Pre-eclampsia in a past pregnancy": "ಹಿಂದಿನ ಗರ್ಭಾವಸ್ಥೆಯಲ್ಲಿ ಪ್ರೀ-ಎಕ್ಲಾಂಪ್ಸಿಯಾ",
+            "High blood pressure before pregnancy": "ಗರ್ಭಧಾರಣೆಗೆ ಮೊದಲು ಅಧಿಕ ರಕ್ತದೊತ್ತಡ",
+            "Diabetes": "ಮಧುಮೇಹ",
+            "Twins or more": "ಅವಳಿ ಅಥವಾ ಹೆಚ್ಚು ಮಕ್ಕಳು",
+            "IVF or fertility treatment": "ಐವಿಎಫ್ ಅಥವಾ ಸಂತಾನ ಚಿಕಿತ್ಸೆ",
+            "Mother or sister had pre-eclampsia": "ತಾಯಿ ಅಥವಾ ಸಹೋದರಿಗೆ ಪ್ರೀ-ಎಕ್ಲಾಂಪ್ಸಿಯಾ ಇತ್ತು",
+            "A previous pregnancy ended in miscarriage": "ಹಿಂದಿನ ಗರ್ಭಾವಸ್ಥೆ ಗರ್ಭಪಾತದಲ್ಲಿ ಕೊನೆಗೊಂಡಿತು",
+            "A previous pregnancy was medically ended": "ಹಿಂದಿನ ಗರ್ಭಾವಸ್ಥೆಯನ್ನು ವೈದ್ಯಕೀಯವಾಗಿ ನಿಲ್ಲಿಸಲಾಯಿತು",
+            "Finish setup": "ಸಿದ್ಧತೆ ಪೂರ್ಣಗೊಳಿಸಿ",
+
+            /* ---- home ---- */
+            "Today": "ಇಂದು",
+            "Two minutes": "ಎರಡು ನಿಮಿಷ",
+            "Swipe through a few quick questions. Right for yes, left for no.": "ಕೆಲವು ಸಣ್ಣ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರಿಸಿ. ಹೌದು ಎಂದರೆ ಬಲಕ್ಕೆ, ಇಲ್ಲ ಎಂದರೆ ಎಡಕ್ಕೆ ಸರಿಸಿ.",
+            "How are you feeling today?": "ಇಂದು ನಿಮಗೆ ಹೇಗಿದೆ?",
+            "What the system is saying": "ವ್ಯವಸ್ಥೆ ಏನು ಹೇಳುತ್ತಿದೆ",
+            "Garbha Sethu never shows an all-clear. A quiet screen means nothing crossed a threshold — it is not a statement that you are well.": "ಗರ್ಭ ಸೇತು ಎಂದಿಗೂ 'ಎಲ್ಲವೂ ಸರಿಯಿದೆ' ಎಂದು ಹೇಳುವುದಿಲ್ಲ. ಖಾಲಿ ಪರದೆ ಎಂದರೆ ಯಾವುದೂ ಮಿತಿ ದಾಟಿಲ್ಲ ಎಂದಷ್ಟೇ — ನೀವು ಆರೋಗ್ಯವಾಗಿದ್ದೀರಿ ಎಂದಲ್ಲ.",
+            "Yes": "ಹೌದು",
+            "No": "ಇಲ್ಲ",
+            "Swipe right for yes, left for no": "ಹೌದು ಎಂದರೆ ಬಲಕ್ಕೆ, ಇಲ್ಲ ಎಂದರೆ ಎಡಕ್ಕೆ",
+            "Thank you": "ಧನ್ಯವಾದಗಳು",
+            "Already checked in": "ಈಗಾಗಲೇ ನೋಂದಾಯಿಸಲಾಗಿದೆ",
+            "You have told us how you feel today.": "ಇಂದು ನಿಮಗೆ ಹೇಗಿದೆ ಎಂದು ನೀವು ತಿಳಿಸಿದ್ದೀರಿ.",
+            "Nothing to report today. That is not an all-clear.": "ಇಂದು ತಿಳಿಸಲು ಏನೂ ಇಲ್ಲ. ಆದರೆ ಇದು 'ಎಲ್ಲವೂ ಸರಿಯಿದೆ' ಎಂದಲ್ಲ.",
+
+            /* ---- symptoms ---- */
+            "Bad headache that will not go": "ಹೋಗದ ತೀವ್ರ ತಲೆನೋವು",
+            "Blurred vision, flashes or spots": "ಮಂಜು ಕಾಣುವುದು, ಮಿಂಚು ಅಥವಾ ಚುಕ್ಕೆಗಳು",
+            "Pain under the ribs on the right": "ಬಲಭಾಗದ ಪಕ್ಕೆಲುಬಿನ ಕೆಳಗೆ ನೋವು",
+            "Sudden swelling of face or hands": "ಮುಖ ಅಥವಾ ಕೈಗಳಲ್ಲಿ ಹಠಾತ್ ಊತ",
+            "Passing much less urine": "ಮೂತ್ರ ತುಂಬಾ ಕಡಿಮೆ ಆಗುತ್ತಿದೆ",
+            "Unusually tired": "ಸಾಮಾನ್ಯಕ್ಕಿಂತ ಹೆಚ್ಚು ಸುಸ್ತು",
+            "Breathless on stairs": "ಮೆಟ್ಟಿಲು ಹತ್ತುವಾಗ ಉಸಿರಾಟದ ತೊಂದರೆ",
+            "Dizzy or light-headed": "ತಲೆ ಸುತ್ತುವಿಕೆ ಅಥವಾ ಮೂರ್ಛೆ ಅನಿಸುವಿಕೆ",
+            "How you feel": "ನಿಮಗೆ ಹೇಗಿದೆ",
+            "Some of these are warning signs when they come together. Be honest — over-reporting is fine.": "ಇವು ಒಟ್ಟಿಗೆ ಕಾಣಿಸಿಕೊಂಡಾಗ ಎಚ್ಚರಿಕೆಯ ಸೂಚನೆಗಳಾಗಿರಬಹುದು. ಪ್ರಾಮಾಣಿಕವಾಗಿರಿ — ಹೆಚ್ಚು ತಿಳಿಸಿದರೆ ತೊಂದರೆ ಇಲ್ಲ.",
+            "Save and check": "ಉಳಿಸಿ ಮತ್ತು ಪರಿಶೀಲಿಸಿ",
+
+            /* ---- nav ---- */
+            "Log": "ದಾಖಲಿಸಿ",
+            "Watch": "ಗಮನ",
+            "Heat": "ಶಾಖ",
+            "Trends": "ಪ್ರವೃತ್ತಿ",
+
+            /* ---- log screen ---- */
+            "Log something": "ಏನಾದರೂ ದಾಖಲಿಸಿ",
+            "TAP ONCE · NOTHING IS SHARED": "ಒಮ್ಮೆ ಒತ್ತಿ · ಯಾವುದನ್ನೂ ಹಂಚಿಕೊಳ್ಳುವುದಿಲ್ಲ",
+            "Contractions": "ಹೊಟ್ಟೆನೋವು",
+            "Timer": "ಸಮಯ ಎಣಿಕೆ",
+            "Fluid leak": "ನೀರು ಸೋರಿಕೆ",
+            "Any amount": "ಎಷ್ಟೇ ಪ್ರಮಾಣ",
+            "Blood pressure": "ರಕ್ತದೊತ್ತಡ",
+            "From your cuff": "ನಿಮ್ಮ ಯಂತ್ರದಿಂದ",
+            "Temperature": "ಉಷ್ಣತೆ",
+            "Thermometer": "ಥರ್ಮಾಮೀಟರ್",
+            "Checklist": "ಪಟ್ಟಿ",
+            "Belt reading": "ಬೆಲ್ಟ್ ಅಳತೆ",
+            "5 minutes": "5 ನಿಮಿಷ",
+            "Weight": "ತೂಕ",
+            "Weekly": "ವಾರಕ್ಕೊಮ್ಮೆ",
+            "Iron tablet": "ಕಬ್ಬಿಣದ ಮಾತ್ರೆ",
+            "Lab result": "ಪರೀಕ್ಷೆಯ ವರದಿ",
+            "Hb from report": "ವರದಿಯಿಂದ ಹಿಮೋಗ್ಲೋಬಿನ್",
+            "Everything logged": "ದಾಖಲಿಸಿದ ಎಲ್ಲವೂ",
+            "Your history": "ನಿಮ್ಮ ಇತಿಹಾಸ",
+
+            /* ---- entry screens ---- */
+            "Sit quietly for five minutes first, arm at heart height. This is the most important number in pregnancy and no wearable can measure it.": "ಮೊದಲು ಐದು ನಿಮಿಷ ಸುಮ್ಮನೆ ಕುಳಿತುಕೊಳ್ಳಿ, ಕೈಯನ್ನು ಹೃದಯದ ಎತ್ತರದಲ್ಲಿ ಇರಿಸಿ. ಗರ್ಭಾವಸ್ಥೆಯಲ್ಲಿ ಇದು ಅತ್ಯಂತ ಮುಖ್ಯ ಸಂಖ್ಯೆ ಮತ್ತು ಯಾವ ಬೆಲ್ಟ್ ಕೂಡ ಇದನ್ನು ಅಳೆಯಲಾರದು.",
+            "Systolic (top)": "ಸಿಸ್ಟೋಲಿಕ್ (ಮೇಲಿನದು)",
+            "Diastolic (bottom)": "ಡಯಾಸ್ಟೋಲಿಕ್ (ಕೆಳಗಿನದು)",
+            "Save reading": "ಅಳತೆ ಉಳಿಸಿ",
+            "Temperature °C": "ಉಷ್ಣತೆ °C",
+            "Morning, before eating, same scales each time. A sudden jump usually means fluid rather than fat.": "ಬೆಳಿಗ್ಗೆ, ಊಟಕ್ಕೆ ಮೊದಲು, ಪ್ರತಿ ಬಾರಿ ಒಂದೇ ತೂಕದ ಯಂತ್ರ ಬಳಸಿ. ಹಠಾತ್ ಏರಿಕೆ ಸಾಮಾನ್ಯವಾಗಿ ಕೊಬ್ಬಲ್ಲ, ನೀರಿನ ಶೇಖರಣೆ.",
+            "Weight in kg": "ತೂಕ ಕೆ.ಜಿ ಯಲ್ಲಿ",
+            "Save weight": "ತೂಕ ಉಳಿಸಿ",
+            "Iron and folic acid tablets are the main defence against anaemia in pregnancy. Missing days is common and worth knowing about.": "ಕಬ್ಬಿಣ ಮತ್ತು ಫೋಲಿಕ್ ಆಮ್ಲದ ಮಾತ್ರೆಗಳು ಗರ್ಭಾವಸ್ಥೆಯಲ್ಲಿ ರಕ್ತಹೀನತೆಯ ವಿರುದ್ಧ ಮುಖ್ಯ ರಕ್ಷಣೆ. ದಿನ ತಪ್ಪುವುದು ಸಾಮಾನ್ಯ, ಆದರೆ ತಿಳಿದಿರುವುದು ಮುಖ್ಯ.",
+            "I took it today": "ಇಂದು ತೆಗೆದುಕೊಂಡೆ",
+            "I missed it today": "ಇಂದು ತಪ್ಪಿಸಿಕೊಂಡೆ",
+            "Copy the haemoglobin value from your blood test. Below 11 g/dL is anaemia in pregnancy.": "ನಿಮ್ಮ ರಕ್ತ ಪರೀಕ್ಷೆಯಿಂದ ಹಿಮೋಗ್ಲೋಬಿನ್ ಸಂಖ್ಯೆಯನ್ನು ಬರೆಯಿರಿ. ಗರ್ಭಾವಸ್ಥೆಯಲ್ಲಿ 11 g/dL ಗಿಂತ ಕಡಿಮೆ ಇದ್ದರೆ ರಕ್ತಹೀನತೆ.",
+            "Haemoglobin g/dL": "ಹಿಮೋಗ್ಲೋಬಿನ್ g/dL",
+            "Save result": "ವರದಿ ಉಳಿಸಿ",
+            "It is hard to tell amniotic fluid from urine at home, and that is fine — only an examination can say. Report it and let someone check.": "ಮನೆಯಲ್ಲಿ ಆಮ್ನಿಯೋಟಿಕ್ ನೀರು ಮತ್ತು ಮೂತ್ರವನ್ನು ಬೇರ್ಪಡಿಸುವುದು ಕಷ್ಟ, ಅದು ಸಹಜ — ಪರೀಕ್ಷೆಯಿಂದ ಮಾತ್ರ ತಿಳಿಯುತ್ತದೆ. ತಿಳಿಸಿ ಮತ್ತು ಪರೀಕ್ಷಿಸಿಕೊಳ್ಳಿ.",
+            "I think fluid is leaking": "ನೀರು ಸೋರುತ್ತಿದೆ ಎಂದು ಅನಿಸುತ್ತಿದೆ",
+            "If it is a gush, or the fluid is green or bloody, or you also feel feverish — go to hospital rather than waiting.": "ಒಮ್ಮೆಗೆ ಹೆಚ್ಚು ಬಂದರೆ, ನೀರು ಹಸಿರು ಅಥವಾ ರಕ್ತಮಿಶ್ರಿತವಾಗಿದ್ದರೆ, ಅಥವಾ ಜ್ವರ ಅನಿಸಿದರೆ — ಕಾಯದೆ ಆಸ್ಪತ್ರೆಗೆ ಹೋಗಿ.",
+            "Recent": "ಇತ್ತೀಚಿನವು",
+
+            /* ---- contractions ---- */
+            "Contraction timer": "ಹೊಟ್ಟೆನೋವಿನ ಸಮಯ ಎಣಿಕೆ",
+            "Not started": "ಪ್ರಾರಂಭವಾಗಿಲ್ಲ",
+            "Contraction started": "ಹೊಟ್ಟೆನೋವು ಶುರುವಾಯಿತು",
+            "Contraction ended": "ಹೊಟ್ಟೆನೋವು ಮುಗಿಯಿತು",
+            "Contraction in progress…": "ಹೊಟ್ಟೆನೋವು ನಡೆಯುತ್ತಿದೆ…",
+            "Check the pattern": "ಮಾದರಿ ಪರಿಶೀಲಿಸಿ",
+            "Reset": "ಮತ್ತೆ ಪ್ರಾರಂಭಿಸಿ",
+
+            /* ---- watch ---- */
+            "What we watch": "ನಾವು ಏನನ್ನು ಗಮನಿಸುತ್ತೇವೆ",
+            "Belt session": "ಬೆಲ್ಟ್ ಅವಧಿ",
+            "Start a 2 minute reading": "2 ನಿಮಿಷದ ಅಳತೆ ಪ್ರಾರಂಭಿಸಿ",
+            "Each row combines more than one input. No single sensor decides anything on its own.": "ಪ್ರತಿ ಸಾಲು ಒಂದಕ್ಕಿಂತ ಹೆಚ್ಚು ಮಾಹಿತಿಯನ್ನು ಸೇರಿಸುತ್ತದೆ. ಯಾವುದೇ ಒಂದು ಸೆನ್ಸರ್ ಸ್ವತಃ ಏನನ್ನೂ ನಿರ್ಧರಿಸುವುದಿಲ್ಲ.",
+            "Fever and infection": "ಜ್ವರ ಮತ್ತು ಸೋಂಕು",
+            "Low haemoglobin": "ಕಡಿಮೆ ಹಿಮೋಗ್ಲೋಬಿನ್",
+            "Heat strain": "ಶಾಖದ ಒತ್ತಡ",
+            "Pre-eclampsia": "ಪ್ರೀ-ಎಕ್ಲಾಂಪ್ಸಿಯಾ",
+            "Waters breaking": "ನೀರು ಒಡೆಯುವಿಕೆ",
+            "Early labour": "ಬೇಗ ಹೆರಿಗೆ ನೋವು",
+            "Signal quality model": "ಸಿಗ್ನಲ್ ಗುಣಮಟ್ಟದ ಮಾದರಿ",
+
+            /* ---- live reading ---- */
+            "Live reading": "ನೇರ ಅಳತೆ",
+            "GETTING READY": "ಸಿದ್ಧವಾಗುತ್ತಿದೆ",
+            "Time left": "ಉಳಿದ ಸಮಯ",
+            "Clean seconds": "ಸ್ಪಷ್ಟ ಸೆಕೆಂಡುಗಳು",
+            "Signal": "ಸಿಗ್ನಲ್",
+            "Stop reading": "ಅಳತೆ ನಿಲ್ಲಿಸಿ",
+            "Take another reading": "ಇನ್ನೊಂದು ಅಳತೆ ತೆಗೆದುಕೊಳ್ಳಿ",
+            "Start again": "ಮತ್ತೆ ಪ್ರಾರಂಭಿಸಿ",
+            "Reading saved": "ಅಳತೆ ಉಳಿಸಲಾಗಿದೆ",
+            "See what it means": "ಇದರ ಅರ್ಥವೇನು ನೋಡಿ",
+            "Finger flat, light pressure, both lights covered.": "ಬೆರಳನ್ನು ಚಪ್ಪಟೆಯಾಗಿ ಇರಿಸಿ, ಹಗುರವಾಗಿ ಒತ್ತಿ, ಎರಡೂ ದೀಪಗಳನ್ನು ಮುಚ್ಚಿ.",
+            "Good signal. Keep still.": "ಸಿಗ್ನಲ್ ಚೆನ್ನಾಗಿದೆ. ಅಲುಗಾಡಬೇಡಿ.",
+            "No finger detected — rest it flat over both lights.": "ಬೆರಳು ಕಾಣಿಸುತ್ತಿಲ್ಲ — ಎರಡೂ ದೀಪಗಳ ಮೇಲೆ ಚಪ್ಪಟೆಯಾಗಿ ಇರಿಸಿ.",
+            "Weak signal — try a slightly lighter touch.": "ಸಿಗ್ನಲ್ ದುರ್ಬಲ — ಸ್ವಲ್ಪ ಹಗುರವಾಗಿ ಸ್ಪರ್ಶಿಸಿ.",
+            "Place your finger on the sensor.": "ಸೆನ್ಸರ್ ಮೇಲೆ ಬೆರಳು ಇರಿಸಿ.",
+            "Take a belt reading?": "ಬೆಲ್ಟ್ ಅಳತೆ ತೆಗೆದುಕೊಳ್ಳಬೇಕೆ?",
+            "Yes, start the reading": "ಹೌದು, ಅಳತೆ ಪ್ರಾರಂಭಿಸಿ",
+            "Not now": "ಈಗ ಬೇಡ",
+
+            /* ---- belt reading ---- */
+            "HOLD STILL": "ಅಲುಗಾಡಬೇಡಿ",
+            "Getting a clean reading": "ಸ್ಪಷ್ಟ ಅಳತೆ ಪಡೆಯುವುದು",
+            "Against your baseline": "ನಿಮ್ಮ ಸಾಮಾನ್ಯ ಮಟ್ಟದೊಂದಿಗೆ ಹೋಲಿಕೆ",
+            "Your usual": "ನಿಮ್ಮ ಸಾಮಾನ್ಯ",
+            "Last reading": "ಕೊನೆಯ ಅಳತೆ",
+            "Baseline not ready": "ಸಾಮಾನ್ಯ ಮಟ್ಟ ಇನ್ನೂ ಸಿದ್ಧವಿಲ್ಲ",
+
+            /* ---- heat ---- */
+            "Heat today": "ಇಂದಿನ ಶಾಖ",
+            "Feels like": "ಅನಿಸುವ ಉಷ್ಣತೆ",
+            "Outdoor": "ಹೊರಗೆ",
+            "Under your belt": "ನಿಮ್ಮ ಬೆಲ್ಟ್ ಒಳಗೆ",
+            "Days ahead": "ಮುಂದಿನ ದಿನಗಳು",
+            "SAFE": "ಸುರಕ್ಷಿತ",
+            "CARE": "ಎಚ್ಚರ",
+            "AVOID": "ತಪ್ಪಿಸಿ",
+
+            /* ---- trends ---- */
+            "Your trends": "ನಿಮ್ಮ ಪ್ರವೃತ್ತಿ",
+            "Resting pulse by session": "ಪ್ರತಿ ಅವಧಿಯ ವಿಶ್ರಾಂತಿ ನಾಡಿಬಡಿತ",
+            "Latest session": "ಇತ್ತೀಚಿನ ಅವಧಿ",
+            "Your resting pulse": "ನಿಮ್ಮ ವಿಶ್ರಾಂತಿ ನಾಡಿಬಡಿತ",
+            "Normal spread": "ಸಾಮಾನ್ಯ ವ್ಯಾಪ್ತಿ",
+
+            /* ---- profile ---- */
+            "Summary for your visit": "ನಿಮ್ಮ ಭೇಟಿಗಾಗಿ ಸಾರಾಂಶ",
+            "One page, four weeks of readings": "ಒಂದು ಪುಟ, ನಾಲ್ಕು ವಾರಗಳ ಅಳತೆಗಳು",
+            "Download PDF": "ಪಿಡಿಎಫ್ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
+            "Your risk assessment": "ನಿಮ್ಮ ಅಪಾಯದ ಮೌಲ್ಯಮಾಪನ",
+            "Your baseline": "ನಿಮ್ಮ ಸಾಮಾನ್ಯ ಮಟ್ಟ",
+            "Settings": "ಸಂಯೋಜನೆಗಳು",
+            "Sign out": "ಸೈನ್ ಔಟ್",
+            "FOGSI gestosis score": "FOGSI ಗೆಸ್ಟೋಸಿಸ್ ಅಂಕ",
+            "High risk": "ಹೆಚ್ಚಿನ ಅಪಾಯ",
+            "Standard": "ಸಾಮಾನ್ಯ",
+            "Obstetric history": "ಪ್ರಸೂತಿ ಇತಿಹಾಸ",
+
+            /* ---- tiers ---- */
+            "Self-care": "ಸ್ವಯಂ ಆರೈಕೆ",
+            "Confirm it": "ಖಚಿತಪಡಿಸಿ",
+            "Call your provider": "ವೈದ್ಯರಿಗೆ ಕರೆ ಮಾಡಿ",
+            "Call now": "ಈಗಲೇ ಕರೆ ಮಾಡಿ",
+            "Go to hospital": "ಆಸ್ಪತ್ರೆಗೆ ಹೋಗಿ",
+            "Go to hospital now": "ಈಗಲೇ ಆಸ್ಪತ್ರೆಗೆ ಹೋಗಿ",
+            "Take your temperature and log it": "ನಿಮ್ಮ ಉಷ್ಣತೆ ಅಳೆದು ದಾಖಲಿಸಿ",
+            "Take your blood pressure": "ನಿಮ್ಮ ರಕ್ತದೊತ್ತಡ ಅಳೆಯಿರಿ",
+            "Ask for an Hb test at your next visit": "ಮುಂದಿನ ಭೇಟಿಯಲ್ಲಿ ಹಿಮೋಗ್ಲೋಬಿನ್ ಪರೀಕ್ಷೆ ಕೇಳಿ",
+            "Call your provider today": "ಇಂದೇ ವೈದ್ಯರಿಗೆ ಕರೆ ಮಾಡಿ",
+            "Drink water now": "ಈಗಲೇ ನೀರು ಕುಡಿಯಿರಿ",
+            "Stay indoors and hydrate": "ಒಳಗೇ ಇರಿ ಮತ್ತು ನೀರು ಕುಡಿಯುತ್ತಿರಿ",
+            "Recheck in 10 minutes": "10 ನಿಮಿಷಗಳ ನಂತರ ಮತ್ತೆ ಪರಿಶೀಲಿಸಿ",
+
+            /* ---- statuses ---- */
+            "loading…": "ಲೋಡ್ ಆಗುತ್ತಿದೆ…",
+            "checking…": "ಪರಿಶೀಲಿಸುತ್ತಿದೆ…",
+            "saving…": "ಉಳಿಸುತ್ತಿದೆ…",
+            "scoring…": "ಅಂಕ ನೀಡುತ್ತಿದೆ…",
+            "calculating…": "ಲೆಕ್ಕ ಹಾಕುತ್ತಿದೆ…",
+            "uncalibrated": "ಪ್ರಮಾಣೀಕರಿಸಿಲ್ಲ",
+            "NO BELT READING YET": "ಇನ್ನೂ ಬೆಲ್ಟ್ ಅಳತೆ ಇಲ್ಲ",
+            "NO READING YET TODAY": "ಇಂದು ಇನ್ನೂ ಅಳತೆ ಇಲ್ಲ",
+            "BELT SERVICE UNREACHABLE": "ಬೆಲ್ಟ್ ಸೇವೆ ಲಭ್ಯವಿಲ್ಲ",
+            "Nothing logged yet.": "ಇನ್ನೂ ಏನೂ ದಾಖಲಿಸಿಲ್ಲ.",
+            "Nothing you have logged crossed a threshold today.": "ಇಂದು ನೀವು ದಾಖಲಿಸಿದ ಯಾವುದೂ ಮಿತಿ ದಾಟಿಲ್ಲ.",
+        };
+
+        let LANG = localStorage.getItem('gsLang') || 'en';
+        const _orig = new Map();
+
+        function _walk(root, fn) {
+            const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+                acceptNode(n) {
+                    const p = n.parentNode;
+                    if (!p) return NodeFilter.FILTER_REJECT;
+                    const t = p.nodeName;
+                    if (t === 'SCRIPT' || t === 'STYLE' || t === 'CANVAS')
+                        return NodeFilter.FILTER_REJECT;
+                    return n.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+                }
+            });
+            const list = [];
+            let n; while (n = w.nextNode()) list.push(n);
+            list.forEach(fn);
+        }
+
+        function _toKn(node) {
+            const raw = node.nodeValue;
+            const key = raw.trim().replace(/\s+/g, ' ');
+            const hit = KN[key];
+            if (!hit) return;
+            if (!_orig.has(node)) _orig.set(node, raw);
+            node.nodeValue = raw.replace(key, hit).replace(raw.trim(), hit);
+        }
+
+        function _toEn(node) {
+            if (_orig.has(node)) { node.nodeValue = _orig.get(node); _orig.delete(node); }
+        }
+
+        function applyLang(root) {
+            const target = root || document.getElementById('app');
+            if (!target) return;
+            _walk(target, LANG === 'kn' ? _toKn : _toEn);
+            // placeholders and value-less inputs
+            target.querySelectorAll('input[placeholder]').forEach(el => {
+                const k = el.getAttribute('data-ph0') || el.placeholder;
+                if (!el.getAttribute('data-ph0')) el.setAttribute('data-ph0', k);
+                el.placeholder = (LANG === 'kn' && KN[k]) ? KN[k] : k;
+            });
+        }
+
+        function setLang(l) {
+            LANG = l;
+            localStorage.setItem('gsLang', l);
+            const en = document.getElementById('lg-en'), kn = document.getElementById('lg-kn');
+            if (en) en.classList.toggle('on', l === 'en');
+            if (kn) kn.classList.toggle('on', l === 'kn');
+            applyLang();
+        }
+
+        /* catches every dynamically rendered card, alert and list */
+        (function () {
+            const app = document.getElementById('app');
+            if (!app) return;
+            let queued = false;
+            new MutationObserver(muts => {
+                if (LANG !== 'kn' || queued) return;
+                queued = true;
+                requestAnimationFrame(() => {
+                    queued = false;
+                    muts.forEach(m => m.addedNodes.forEach(n => {
+                        if (n.nodeType === 1) applyLang(n);
+                        else if (n.nodeType === 3) _toKn(n);
+                    }));
+                });
+            }).observe(app, { childList: true, subtree: true });
+        })();
+
+        setLang(LANG);
 
         paintNav('s-home');
     </script>
